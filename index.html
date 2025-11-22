@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>QuadRico – Générateur de quadrillage</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      margin-top: 0;
+    }
+    .controls {
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    label {
+      font-size: 14px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 10px;
+    }
+    #msg {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #b00;
+    }
+  </style>
+</head>
+<body>
+  <h2>QuadRico – Générateur de quadrillage</h2>
+
+  <div class="controls">
+    <label>
+      Image :
+      <input type="file" id="imageLoader" accept="image/*">
+    </label>
+
+    <label>
+      Colonnes :
+      <input type="number" id="cols" value="10" min="1" style="width:60px">
+    </label>
+
+    <label>
+      Lignes :
+      <input type="number" id="rows" value="14" min="1" style="width:60px">
+    </label>
+
+    <!-- Choix du type de quadrillage -->
+    <label>
+      <input type="radio" name="gridType" value="fsi" checked>
+      Quadrillage FSI (4 couleurs)
+    </label>
+    <label>
+      <input type="radio" name="gridType" value="uni">
+      Quadrillage uni (rouge)
+    </label>
+
+    <!-- Option codes dans les cases -->
+    <label>
+      <input type="checkbox" id="showLabels">
+      Afficher le code dans chaque case (A1, B3…)
+    </label>
+
+    <button id="drawBtn">Appliquer le quadrillage</button>
+    <button id="downloadBtn" disabled>Télécharger PNG</button>
+  </div>
+
+  <div id="msg"></div>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const imageLoader = document.getElementById('imageLoader');
+    const canvas      = document.getElementById('canvas');
+    const ctx         = canvas.getContext('2d');
+    const drawBtn     = document.getElementById('drawBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const msg         = document.getElementById('msg');
+    const showLabels  = document.getElementById('showLabels');
+
+    let img = null;
+
+    const MARGIN_LEFT = 40;
+    const MARGIN_TOP  = 40;
+
+    function setMsg(text) {
+      msg.textContent = text || "";
+    }
+
+    // Chargement de l'image
+    imageLoader.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) {
+        setMsg("Aucun fichier sélectionné.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const image = new Image();
+        image.onload = function () {
+          img = image;
+          setMsg("Image chargée. Choisis colonnes / lignes puis clique sur \"Appliquer le quadrillage\".");
+          drawBase();
+          downloadBtn.disabled = true;
+        };
+        image.onerror = function () {
+          setMsg("Erreur lors du chargement de l'image.");
+        };
+        image.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Dessine uniquement l'image de base
+    function drawBase() {
+      if (!img) {
+        setMsg("Charge une image avant de tracer la grille.");
+        return;
+      }
+      canvas.width  = img.width  + MARGIN_LEFT;
+      canvas.height = img.height + MARGIN_TOP;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
+    }
+
+    // Récupère le type de quadrillage choisi
+    function getGridType() {
+      const radios = document.querySelectorAll('input[name="gridType"]');
+      for (const r of radios) {
+        if (r.checked) return r.value;
+      }
+      return "fsi";
+    }
+
+    // Dessine la grille (FSI ou uni) + légendes
+    function drawGrid() {
+      if (!img) {
+        setMsg("Charge une image avant de tracer la grille.");
+        return;
+      }
+
+      const cols = parseInt(document.getElementById('cols').value, 10);
+      const rows = parseInt(document.getElementById('rows').value, 10);
+
+      if (!cols || !rows || cols < 1 || rows < 1) {
+        setMsg("Colonnes / lignes invalides.");
+        return;
+      }
+
+      const gridType = getGridType();
+
+      setMsg("");
+      drawBase();
+
+      const imgW = img.width;
+      const imgH = img.height;
+      const cellW = imgW / cols;
+      const cellH = imgH / rows;
+
+      // Couleurs pour le mode FSI
+      const colorTL = 'yellow'; // haut gauche
+      const colorTR = 'blue';   // haut droite
+      const colorBR = 'green';  // bas droite
+      const colorBL = 'red';    // bas gauche
+
+      const midCol = cols / 2;
+      const midRow = rows / 2;
+
+      ctx.lineWidth = 1.5;
+
+      // Bordures colorées des cellules
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let color;
+
+          if (gridType === "uni") {
+            // Quadrillage uniforme rouge
+            color = "red";
+          } else {
+            // Quadrillage FSI 4 couleurs (par quadrants)
+            if (c < midCol && r < midRow)       color = colorTL;
+            else if (c >= midCol && r < midRow) color = colorTR;
+            else if (c >= midCol && r >= midRow)color = colorBR;
+            else                                color = colorBL;
+          }
+
+          ctx.strokeStyle = color;
+          const x = MARGIN_LEFT + c * cellW;
+          const y = MARGIN_TOP  + r * cellH;
+          ctx.strokeRect(x, y, cellW, cellH);
+        }
+      }
+
+      // Légendes axes en noir
+      ctx.fillStyle = 'black';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Abscisses (colonnes)
+      for (let c = 0; c < cols; c++) {
+        let label;
+        if (cols <= 26) {
+          label = String.fromCharCode(65 + c); // A, B, C...
+        } else {
+          label = (c + 1).toString();
+        }
+        const x = MARGIN_LEFT + (c + 0.5) * cellW;
+        const y = MARGIN_TOP / 2;
+        ctx.fillText(label, x, y);
+      }
+
+      // Ordonnées (lignes)
+      ctx.textAlign = 'right';
+      for (let r = 0; r < rows; r++) {
+        const label = (r + 1).toString();
+        const x = MARGIN_LEFT - 5;
+        const y = MARGIN_TOP + (r + 0.5) * cellH;
+        ctx.fillText(label, x, y);
+      }
+
+      // Labels internes type A1, B3, H5…
+      if (showLabels.checked) {
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = (cellH * 0.35) + "px sans-serif";
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+
+            let colName;
+            if (cols <= 26) {
+              colName = String.fromCharCode(65 + c);
+            } else {
+              colName = (c + 1).toString();
+            }
+
+            const label = colName + (r + 1); // A1, B3, H5…
+
+            const x = MARGIN_LEFT + (c + 0.5) * cellW;
+            const y = MARGIN_TOP  + (r + 0.5) * cellH;
+            ctx.fillText(label, x, y);
+          }
+        }
+      }
+
+      downloadBtn.disabled = false;
+      setMsg("Quadrillage appliqué. Tu peux télécharger le PNG.");
+    }
+
+    drawBtn.addEventListener('click', drawGrid);
+
+    // Téléchargement en PNG
+    downloadBtn.addEventListener('click', function () {
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'image_quadrillage.png';
+      link.click();
+    });
+  </script>
+</body>
+</html>
