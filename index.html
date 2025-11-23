@@ -154,6 +154,10 @@
     .top-icon-btn.contact  { border-color: #facc15; }
     .top-icon-btn.briefing { border-color: #a855f7; }
 
+    #optionsToggle {
+      display: none; /* visible uniquement mobile */
+    }
+
     .icon-hint {
       font-size: 12px;
       color: var(--text-sub);
@@ -355,7 +359,7 @@
     }
 
     .canvas-scroll {
-      overflow: visible; /* pas de scroll interne par défaut (≤112%) */
+      overflow: visible;
       border-radius: 8px;
     }
 
@@ -368,7 +372,7 @@
       z-index: 400;
     }
 
-    /* Mode briefing : cache le panneau de droite, la carte prend toute la place */
+    /* Mode briefing */
     body.briefing-mode .side-panel {
       display: none;
     }
@@ -376,7 +380,7 @@
       flex: 1 1 auto;
     }
 
-    /* BLOC OPTIONS (2 colonnes asymétriques) */
+    /* BLOC OPTIONS */
     .controls {
       display: grid;
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -485,7 +489,7 @@
     }
 
     .group-full {
-      grid-column: 1 / -1;  /* occupe les 2 colonnes */
+      grid-column: 1 / -1;
     }
 
     .selection-modes {
@@ -582,14 +586,22 @@
       .main-layout {
         flex-direction: column;
       }
+
+      .canvas-wrapper {
+        width: 100%;
+      }
+
       .side-panel {
         position: static;
         width: 100%;
         max-width: 100%;
         margin-top: 10px;
+        display: flex;
+        justify-content: center; /* centrage du bloc options */
       }
-      .canvas-wrapper {
-        width: 100%;
+
+      body.options-collapsed .side-panel {
+        display: none;
       }
 
       /* Zoom : caché sur mobile */
@@ -597,11 +609,12 @@
         display: none;
       }
 
-      /* bloc options : une colonne + léger "dézoom" visuel */
+      /* bloc options : une colonne + léger "dézoom" visuel et centré */
       .controls {
         grid-template-columns: 1fr;
         transform: scale(0.95);
         transform-origin: top center;
+        margin: 0 auto;
       }
 
       /* Toolbar : retours + supprimer en haut, APPLIQUER seul en dessous */
@@ -633,6 +646,10 @@
 
       .system-icons {
         justify-content: center;
+      }
+
+      #optionsToggle {
+        display: inline-flex;
       }
 
       label {
@@ -693,6 +710,9 @@
       </button>
       <button id="contactBtn" class="top-icon-btn contact" aria-label="Contact">
         ✉
+      </button>
+      <button id="optionsToggle" class="top-icon-btn" aria-label="Afficher / masquer les options">
+        ⚙ Options
       </button>
     </div>
 
@@ -989,6 +1009,7 @@
     const fullscreenToggle  = document.getElementById('fullscreenToggle');
     const briefingBtn   = document.getElementById('briefingBtn');
     const contactBtn    = document.getElementById('contactBtn');
+    const optionsToggle = document.getElementById('optionsToggle');
     const root          = document.documentElement;
 
     const modeApplyBtn       = document.getElementById('modeApply');
@@ -1106,6 +1127,7 @@
     addIconHint(downloadBtn,      "Télécharger l'image quadrillée en PNG");
     addIconHint(resetBtn,         "Réinitialiser tous les réglages et effacer la grille");
     addIconHint(contactBtn,       "Envoyer un mail au concepteur de QuadRico");
+    addIconHint(optionsToggle,    "Afficher / masquer le bloc options (mode mobile)");
 
     contactBtn.addEventListener('click', () => {
       contactInfo.textContent =
@@ -1133,6 +1155,26 @@
         setIconHint("Mode normal : réglages réaffichés.");
       }
     });
+
+    optionsToggle.addEventListener('click', () => {
+      document.body.classList.toggle('options-collapsed');
+    });
+
+    function initOptionsCollapsedOnLoad() {
+      if (window.innerWidth <= 900) {
+        document.body.classList.add('options-collapsed');
+      } else {
+        document.body.classList.remove('options-collapsed');
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        document.body.classList.remove('options-collapsed');
+      }
+    });
+
+    initOptionsCollapsedOnLoad();
 
     imageLoader.addEventListener('change', function (e) {
       const file = e.target.files[0];
@@ -1647,21 +1689,21 @@
           borderWidth,
           text,
           textColor: txtColor,
-          noCode: false,
+          noCode: text.length > 0,
           hidden: false,
           alpha
         };
       } else if (selectionAction === "eraseBorder") {
-        selectedCells[key] = {
-          hidden: true,
-          noCode: true
-        };
+        const cell = selectedCells[key] || {};
+        delete cell.borderColor;
+        delete cell.borderWidth;
+        cell.hidden = false;
+        selectedCells[key] = cell;
       } else if (selectionAction === "eraseCode") {
-        if (!selectedCells[key]) {
-          selectedCells[key] = { noCode: true };
-        } else {
-          selectedCells[key].noCode = true;
-        }
+        const cell = selectedCells[key] || {};
+        cell.noCode = true;
+        cell.text = "";
+        selectedCells[key] = cell;
       }
 
       drawGrid();
@@ -1798,6 +1840,7 @@
       autoRefresh.checked = false;
 
       setMsg("Réinitialisé. Charge une nouvelle image ou active \"Grille sans image\" pour recommencer.");
+      initOptionsCollapsedOnLoad();
     });
 
     zoomRange.addEventListener('input', () => {
