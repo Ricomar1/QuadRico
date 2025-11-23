@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* PALETTES THÈME */
-
     :root[data-theme="dark"] {
       --bg-main: #080a0f;
       --bg-panel: #151821;
@@ -162,7 +161,7 @@
       text-align: center;
     }
 
-    /* Ligne Source + Zoom */
+    /* Ligne Source + mid-box + Zoom */
     .source-zoom-row {
       display: flex;
       gap: 10px;
@@ -172,7 +171,8 @@
     }
 
     .source-box,
-    .zoom-box {
+    .zoom-box,
+    .mid-box {
       background: var(--bg-panel);
       border: 1px solid var(--border-panel);
       border-radius: 10px;
@@ -182,12 +182,14 @@
     }
 
     :root[data-theme="light"] .source-box,
-    :root[data-theme="light"] .zoom-box {
+    :root[data-theme="light"] .zoom-box,
+    :root[data-theme="light"] .mid-box {
       box-shadow: 0 2px 7px rgba(148,163,184,0.7);
     }
 
     .source-box strong,
-    .zoom-box strong {
+    .zoom-box strong,
+    .mid-box strong {
       display: block;
       font-size: 13px;
       color: var(--accent);
@@ -195,7 +197,8 @@
       text-align: center;
     }
 
-    .source-box label {
+    .source-box label,
+    .mid-box label {
       font-size: 13px;
       color: var(--text-sub);
       display: flex;
@@ -223,6 +226,22 @@
     #zoomRange {
       width: 120px;
       margin-left: 4px;
+    }
+
+    #zoomNumber {
+      width: 60px;
+      margin-left: 6px;
+      background: #090c14;
+      border: 1px solid #32394b;
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 2px 6px;
+    }
+
+    :root[data-theme="light"] #zoomNumber {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #111827;
     }
 
     /* Toolbar APPLIQUER / SUPPRIMER – STICKY DANS LA CARTE */
@@ -582,7 +601,8 @@
         align-items: stretch;
       }
       .source-box,
-      .zoom-box {
+      .zoom-box,
+      .mid-box {
         width: 100%;
       }
       .system-icons {
@@ -652,6 +672,39 @@
           <input type="file" id="imageLoader" accept="image/*">
         </label>
       </div>
+
+      <div class="mid-box">
+        <strong>Paramètres de grille</strong>
+        <label>
+          <span>Grille sans image</span>
+          <input type="checkbox" id="gridOnly">
+        </label>
+        <label>
+          <span>Colonnes :</span>
+          <input type="number" id="cols" value="10" min="1">
+        </label>
+        <label>
+          <span>Lignes :</span>
+          <input type="number" id="rows" value="14" min="1">
+        </label>
+      </div>
+
+      <div class="mid-box">
+        <strong>Légende</strong>
+        <label>
+          <span>Pas de légende</span>
+          <input type="radio" name="legendMode" value="none">
+        </label>
+        <label>
+          <span>Légende partielle</span>
+          <input type="radio" name="legendMode" value="partial">
+        </label>
+        <label>
+          <span>Légende totale (4 côtés)</span>
+          <input type="radio" name="legendMode" value="full" checked>
+        </label>
+      </div>
+
       <div class="zoom-box">
         <strong>Zoom & vue</strong>
         <label>
@@ -659,6 +712,7 @@
           <span>
             <input type="range" id="zoomRange" min="50" max="300" value="100">
             <span id="zoomValue">100%</span>
+            <input type="number" id="zoomNumber" min="50" max="300" value="100">
           </span>
         </label>
       </div>
@@ -690,35 +744,11 @@
 
     <div class="side-panel">
       <div class="controls">
-        <div class="group">
-          <strong>Paramètres de grille :</strong>
+        <div class="group group-full">
+          <strong>Rafraîchissement auto :</strong>
           <label>
-            <span>Grille sans image</span>
-            <input type="checkbox" id="gridOnly">
-          </label>
-          <label>
-            <span>Colonnes :</span>
-            <input type="number" id="cols" value="10" min="1">
-          </label>
-          <label>
-            <span>Lignes :</span>
-            <input type="number" id="rows" value="14" min="1">
-          </label>
-        </div>
-
-        <div class="group">
-          <strong>Légende :</strong>
-          <label>
-            <span>Pas de légende</span>
-            <input type="radio" name="legendMode" value="none">
-          </label>
-          <label>
-            <span>Légende partielle</span>
-            <input type="radio" name="legendMode" value="partial">
-          </label>
-          <label>
-            <span>Légende totale (4 côtés)</span>
-            <input type="radio" name="legendMode" value="full" checked>
+            <span>Appliquer automatiquement les modifications</span>
+            <input type="checkbox" id="autoRefresh">
           </label>
         </div>
 
@@ -913,6 +943,7 @@
 
     const zoomRange     = document.getElementById('zoomRange');
     const zoomValue     = document.getElementById('zoomValue');
+    const zoomNumber    = document.getElementById('zoomNumber');
 
     const selectionMode = document.getElementById('selectionMode');
     const borderColorEl = document.getElementById('borderColor');
@@ -929,6 +960,7 @@
     const modeApplyBtn       = document.getElementById('modeApply');
     const modeEraseBorderBtn = document.getElementById('modeEraseBorder');
     const modeEraseCodeBtn   = document.getElementById('modeEraseCode');
+    const autoRefresh        = document.getElementById('autoRefresh');
 
     let selectionAction = "apply";
 
@@ -963,9 +995,9 @@
       }
     }
 
-    crossBlack.addEventListener('change', () => handleCrossChange(crossBlack));
-    crossRed.addEventListener('change',   () => handleCrossChange(crossRed));
-    crossFSI.addEventListener('change',   () => handleCrossChange(crossFSI));
+    crossBlack.addEventListener('change', () => { handleCrossChange(crossBlack); autoRedrawIfEnabled(); });
+    crossRed.addEventListener('change',   () => { handleCrossChange(crossRed);   autoRedrawIfEnabled(); });
+    crossFSI.addEventListener('change',   () => { handleCrossChange(crossFSI);   autoRedrawIfEnabled(); });
 
     function getLegendMode() {
       const r = document.querySelector('input[name="legendMode"]:checked');
@@ -1002,7 +1034,11 @@
       orientationMode = (orientationMode === "portrait") ? "landscape" : "portrait";
       updateOrientationButton();
       if (img || gridOnly.checked) {
-        drawGrid();
+        if (autoRefresh.checked) {
+          drawGrid();
+        } else {
+          drawGrid();
+        }
       } else {
         setMsg("Choisis une image ou active \"Grille sans image\" puis clique sur APPLIQUER.");
       }
@@ -1018,22 +1054,6 @@
       }
     });
 
-    briefingBtn.addEventListener('click', () => {
-      briefingMode = !briefingMode;
-      document.body.classList.toggle('briefing-mode', briefingMode);
-      setIconHint(
-        briefingMode
-          ? "Mode briefing : la carte est mise en avant, les réglages sont masqués."
-          : "Mode normal : réglages réaffichés."
-      );
-    });
-
-    contactBtn.addEventListener('click', () => {
-      contactInfo.textContent =
-        "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
-      window.location.href = "mailto:eric.marchetti@gendarmerie.interieur.gouv.fr";
-    });
-
     function setIconHint(text) {
       iconHint.textContent = text || "";
     }
@@ -1046,12 +1066,39 @@
     addIconHint(themeToggle,      "Basculer entre mode sombre et mode clair");
     addIconHint(orientationToggle,"Basculer entre portrait et paysage (affichage & impression)");
     addIconHint(fullscreenToggle, "Basculer en mode plein écran");
-    addIconHint(briefingBtn,      "Mode briefing : cacher les réglages, mettre la carte en avant");
+    addIconHint(briefingBtn,      "Mode briefing : la carte est mise en avant, les réglages sont masqués.");
     addIconHint(printBtn,         "Imprimer / exporter en PDF A4 (portrait/paysage)");
     addIconHint(printA3Btn,       "Imprimer / exporter en PDF A3 (portrait/paysage)");
     addIconHint(downloadBtn,      "Télécharger l'image quadrillée en PNG");
     addIconHint(resetBtn,         "Réinitialiser tous les réglages et effacer la grille");
     addIconHint(contactBtn,       "Envoyer un mail au concepteur de QuadRico");
+
+    contactBtn.addEventListener('click', () => {
+      contactInfo.textContent =
+        "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
+      window.location.href = "mailto:eric.marchetti@gendarmerie.interieur.gouv.fr";
+    });
+
+    briefingBtn.addEventListener('click', () => {
+      briefingMode = !briefingMode;
+      document.body.classList.toggle('briefing-mode', briefingMode);
+
+      if (briefingMode && baseCanvasWidth && baseCanvasHeight) {
+        const availW = window.innerWidth - 40;
+        const availH = window.innerHeight - 160;
+        let scale = Math.min(availW / baseCanvasWidth, availH / baseCanvasHeight);
+        scale = Math.max(0.5, Math.min(scale, 3));
+        zoomRange.value = Math.round(scale * 100);
+        zoomNumber.value = zoomRange.value;
+        applyZoomScale();
+        setIconHint("Mode briefing : vue générale de la carte.");
+      } else {
+        zoomRange.value = 100;
+        zoomNumber.value = 100;
+        applyZoomScale();
+        setIconHint("Mode normal : réglages réaffichés.");
+      }
+    });
 
     imageLoader.addEventListener('change', function (e) {
       const file = e.target.files[0];
@@ -1069,6 +1116,9 @@
           setMsg("Image chargée. Clique sur \"APPLIQUER\".");
           drawBase();
           downloadBtn.disabled = true;
+          if (autoRefresh.checked) {
+            drawGrid();
+          }
         };
         image.onerror = function () {
           setMsg("Erreur lors du chargement de l'image.");
@@ -1107,11 +1157,20 @@
       if (!baseCanvasWidth || !baseCanvasHeight) return;
       const zoom = parseInt(zoomRange.value, 10);
       const scale = zoom / 100;
-      canvas.style.width  = (baseCanvasWidth * scale) + "px";
-      canvas.style.height = (baseCanvasHeight * scale) + "px";
-      zoomValue.textContent = zoom + "%";
-
       const scrollContainer = document.querySelector('.canvas-scroll');
+      const isMobile = window.innerWidth < 900;
+
+      zoomValue.textContent = zoom + "%";
+      if (zoomNumber) zoomNumber.value = zoom;
+
+      if (isMobile && zoom <= 100) {
+        canvas.style.width  = "";
+        canvas.style.height = "";
+      } else {
+        canvas.style.width  = (baseCanvasWidth * scale) + "px";
+        canvas.style.height = (baseCanvasHeight * scale) + "px";
+      }
+
       if (scrollContainer) {
         if (zoom >= 113) {
           scrollContainer.style.maxHeight = '80vh';
@@ -1132,8 +1191,13 @@
 
       if (useGridOnly || !img) {
         const cellSize = 40;
-        imgW = cols * cellSize;
-        imgH = rows * cellSize;
+        if (orientationMode === "portrait") {
+          imgW = cols * cellSize;
+          imgH = rows * cellSize;
+        } else {
+          imgW = rows * cellSize;
+          imgH = cols * cellSize;
+        }
       } else {
         if (orientationMode === "portrait") {
           imgW = img.width;
@@ -1307,7 +1371,7 @@
       if (legendMode !== "none") {
         ctx.setLineDash([]);
         ctx.globalAlpha = 1;
-        ctx.fillStyle = "black";
+        ctx.fillStyle = useGridOnly ? "#ffffff" : "black";  // Blanc sur grille sans image
         ctx.font = "16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -1516,8 +1580,11 @@
       if (!lastGridGeom) return;
 
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
 
       const { cols, rows, cellW, cellH, imgW, imgH } = lastGridGeom;
 
@@ -1665,6 +1732,7 @@
       codeOpacity.value = 100;
 
       zoomRange.value = 100;
+      zoomNumber.value = 100;
       zoomValue.textContent = "100%";
       baseCanvasWidth = 0;
       baseCanvasHeight = 0;
@@ -1693,12 +1761,65 @@
       briefingMode = false;
       document.body.classList.remove('briefing-mode');
 
+      autoRefresh.checked = false;
+
       setMsg("Réinitialisé. Charge une nouvelle image ou active \"Grille sans image\" pour recommencer.");
     });
 
     zoomRange.addEventListener('input', () => {
       applyZoomScale();
     });
+
+    zoomNumber.addEventListener('change', () => {
+      let val = parseInt(zoomNumber.value, 10);
+      if (isNaN(val)) val = 100;
+      if (val < 50) val = 50;
+      if (val > 300) val = 300;
+      zoomNumber.value = val;
+      zoomRange.value = val;
+      applyZoomScale();
+    });
+
+    function autoRedrawIfEnabled() {
+      if (!autoRefresh.checked) return;
+      if (!img && !gridOnly.checked) {
+        setMsg("Active \"Grille sans image\" ou charge une image, puis applique.");
+        return;
+      }
+      drawGrid();
+    }
+
+    autoRefresh.addEventListener('change', () => {
+      if (autoRefresh.checked) {
+        if (img || gridOnly.checked) {
+          drawGrid();
+        } else {
+          setMsg("Active \"Grille sans image\" ou charge une image.");
+        }
+      }
+    });
+
+    gridOnly.addEventListener('change', autoRedrawIfEnabled);
+    document.getElementById('cols').addEventListener('change', autoRedrawIfEnabled);
+    document.getElementById('rows').addEventListener('change', autoRedrawIfEnabled);
+
+    document.querySelectorAll('input[name="legendMode"]').forEach(r => {
+      r.addEventListener('change', autoRedrawIfEnabled);
+    });
+
+    document.querySelectorAll('input[name="gridType"]').forEach(r => {
+      r.addEventListener('change', autoRedrawIfEnabled);
+    });
+
+    document.querySelectorAll('input[name="labelMode"]').forEach(r => {
+      r.addEventListener('change', autoRedrawIfEnabled);
+    });
+
+    imageOpacity.addEventListener('input', autoRedrawIfEnabled);
+    gridOpacity.addEventListener('input', autoRedrawIfEnabled);
+    codeOpacity.addEventListener('input', autoRedrawIfEnabled);
+    dashedLines.addEventListener('change', autoRedrawIfEnabled);
+
   </script>
 </body>
 </html>
