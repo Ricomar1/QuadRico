@@ -1,101 +1,1020 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>QuadRico – Générateur de quadrillage</title>
   <style>
+    /* PALETTES THÈME */
+
+    :root[data-theme="dark"] {
+      --bg-main: #080a0f;
+      --bg-panel: #151821;
+      --border-panel: #2b3140;
+      --text-main: #f5f5f7;
+      --text-sub: #c3c7d1;
+      --accent: #2f81ff;
+      --accent-soft: rgba(47,129,255,0.15);
+      --danger: #ff4b5c;
+      --btn-bg: #1e2330;
+      --btn-bg-hover: #272d3c;
+      --canvas-bg: #000000;
+    }
+
+    :root[data-theme="light"] {
+      --bg-main: #f4f5f8;
+      --bg-panel: #ffffff;
+      --border-panel: #d3d7e2;
+      --text-main: #111827;
+      --text-sub: #4b5563;
+      --accent: #2563eb;
+      --accent-soft: rgba(37,99,235,0.08);
+      --danger: #dc2626;
+      --btn-bg: #f3f4f6;
+      --btn-bg-hover: #e5e7eb;
+      --canvas-bg: #ffffff;
+    }
+
     body {
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 20px;
+      background: radial-gradient(circle at top left, #141b2b 0, #080a0f 45%, #050609 100%);
+      color: var(--text-main);
+      transition: background 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
-    h2 {
-      margin-top: 0;
+
+    :root[data-theme="light"] body {
+      background: #e5e7eb;
     }
-    .controls {
-      margin-bottom: 10px;
+
+    .header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
       align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
     }
-    label {
-      font-size: 14px;
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #111522;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      overflow: hidden;
+      border: 1px solid #28324a;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
     }
-    canvas {
-      border: 1px solid #ccc;
-      max-width: 100%;
-      height: auto;
+
+    :root[data-theme="light"] .logo-mark {
+      background: #ffffff;
+      border-color: #cbd5f5;
+      box-shadow: 0 0 8px rgba(148,163,184,0.6);
+    }
+
+    .logo-cell { width: 100%; height: 100%; }
+    .logo-yellow { background: #ffd54a; }
+    .logo-blue   { background: #4aa3ff; }
+    .logo-green  { background: #4adf7c; }
+    .logo-red    { background: #ff5f5f; }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .logo-text-main {
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.05em;
+    }
+    .logo-text-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    /* BARRE PRINCIPALE (3 LIGNES) */
+
+    .top-bar-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 6px 0;
+    }
+
+    .contact-info {
+      font-size: 12px;
+      color: var(--text-sub);
+      text-align: center;
+      min-height: 16px;
+      white-space: normal;
+    }
+
+    .system-icons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .top-icon-btn {
+      min-width: auto;
+      padding: 10px 14px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border-radius: 999px;
+      border: 1px solid #2c3345;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,0,0,0.45);
+    }
+
+    :root[data-theme="light"] .top-icon-btn {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 7px rgba(148,163,184,0.75);
+    }
+
+    .top-icon-btn:hover {
+      background: var(--btn-bg-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+
+    .top-icon-btn.reset    { border-color: var(--danger); }
+    .top-icon-btn.printA4  { border-color: #4adf7c; }
+    .top-icon-btn.printA3  { border-color: #22c55e; }
+    .top-icon-btn.download { border-color: var(--accent); }
+    .top-icon-btn.contact  { border-color: #facc15; }
+    .top-icon-btn.briefing { border-color: #a855f7; }
+
+    .icon-hint {
+      font-size: 12px;
+      color: var(--text-sub);
+      min-height: 16px;
+      text-align: center;
+    }
+
+    /* Ligne Source + Zoom */
+    .source-zoom-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .source-box,
+    .zoom-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 10px;
+      padding: 8px 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.35);
+      min-width: 230px;
+    }
+
+    :root[data-theme="light"] .source-box,
+    :root[data-theme="light"] .zoom-box {
+      box-shadow: 0 2px 7px rgba(148,163,184,0.7);
+    }
+
+    .source-box strong,
+    .zoom-box strong {
       display: block;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .source-box label {
+      font-size: 13px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .source-box input[type="file"] {
+      color: var(--text-sub);
+      max-width: 180px;
+    }
+
+    .zoom-box label {
+      font-size: 13px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    #zoomRange {
+      width: 120px;
+      margin-left: 4px;
+    }
+
+    /* Toolbar APPLIQUER / SUPPRIMER – STICKY DANS LA CARTE */
+
+    .toolbar-main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+
+      position: sticky;
+      top: 0;
+      z-index: 500;
+
+      background: radial-gradient(circle at top, rgba(8,10,15,0.98), rgba(8,10,15,0.95));
+      padding: 6px 14px;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(60,68,90,0.9);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+    }
+
+    :root[data-theme="light"] .toolbar-main {
+      background: rgba(249,250,251,0.96);
+      border-color: #d1d5db;
+      box-shadow: 0 4px 12px rgba(148,163,184,0.8);
+    }
+
+    .toolbar-main button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toolbar-main .undo-redo-btn {
+      padding: 10px 14px;
+      font-size: 18px;
+      border-radius: 999px;
+      border: 1px solid #2c3345;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+      min-width: 50px;
+    }
+
+    .toolbar-main .undo-redo-btn:hover {
+      background: var(--btn-bg-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    :root[data-theme="light"] .toolbar-main .undo-redo-btn {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 7px rgba(148,163,184,0.7);
+    }
+
+    #drawBtn {
+      font-size: 17px;
+      font-weight: 600;
+      min-width: 180px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--text-main);
+      box-shadow: 0 0 10px rgba(30,64,175,0.8);
+    }
+
+    #drawBtn:hover {
+      background: rgba(47,129,255,0.23);
+      transform: translateY(-1px);
+    }
+
+    #undoDeleteBtn {
+      font-size: 14px;
+      min-width: 150px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid #2c3345;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+
+    :root[data-theme="light"] #undoDeleteBtn {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 7px rgba(148,163,184,0.7);
+    }
+
+    #undoDeleteBtn:hover {
+      background: var(--btn-bg-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    /* LAYOUT PRINCIPAL */
+
+    .main-layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
       margin-top: 10px;
     }
+
+    .canvas-wrapper {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+      margin-right: 520px; /* + large pour la nouvelle sidebar */
+    }
+
+    .canvas-scroll {
+      max-height: 80vh;
+      overflow: auto;
+      border-radius: 8px;
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 180px;
+      right: 20px;
+      bottom: 20px;
+      width: 460px;       /* plus large */
+      max-width: 480px;   /* plus large */
+      z-index: 400;
+    }
+
+    /* Mode briefing : cache le panneau de droite, la carte prend toute la place */
+    body.briefing-mode .side-panel {
+      display: none;
+    }
+    body.briefing-mode .canvas-wrapper {
+      margin-right: 0;
+    }
+
+    /* BLOC OPTIONS : scroll interne (figé à droite) */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+      background: var(--bg-panel);
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-panel);
+      box-shadow: 0 0 16px rgba(0,0,0,0.45);
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    :root[data-theme="light"] .controls {
+      box-shadow: 0 4px 10px rgba(148,163,184,0.45);
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    input[type="number"],
+    input[type="range"],
+    select,
+    input[type="text"] {
+      font-size: 13px;
+    }
+
+    input[type="number"] {
+      margin-left: 4px;
+      background: #090c14;
+      border: 1px solid #32394b;
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 2px 6px;
+      width: 60px;
+    }
+
+    :root[data-theme="light"] input[type="number"] {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #111827;
+    }
+
+    input[type="range"] {
+      width: 120px;
+      margin-left: 4px;
+    }
+
+    select {
+      margin-left: 4px;
+      padding: 2px 4px;
+      border-radius: 6px;
+      border: 1px solid #32394b;
+      background: #090c14;
+      color: var(--text-main);
+    }
+
+    :root[data-theme="light"] select {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #111827;
+    }
+
+    input[type="text"] {
+      margin-left: 4px;
+      padding: 2px 4px;
+      border-radius: 6px;
+      border: 1px solid #32394b;
+      background: #090c14;
+      color: var(--text-main);
+      width: 130px;
+    }
+
+    :root[data-theme="light"] input[type="text"] {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #111827;
+    }
+
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(7, 10, 18, 0.7);
+      border: 1px solid rgba(60,68,90,0.9);
+    }
+
+    :root[data-theme="light"] .group {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .group strong {
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 1px;
+      white-space: nowrap;
+    }
+
+    .group-full {
+      grid-column: 1 / -1;
+    }
+
+    .selection-modes {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+    }
+
+    .selection-mode-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #2c3345;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0,0,0,0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    :root[data-theme="light"] .selection-mode-btn {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 4px rgba(148,163,184,0.6);
+    }
+
+    .selection-mode-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .selection-mode-btn span.icon {
+      font-size: 14px;
+    }
+
+    .border-width-options {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .border-width-options span.label-title {
+      color: var(--text-sub);
+      font-size: 12px;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    canvas {
+      border: 1px solid #3a4158;
+      display: block;
+      margin-top: 12px;
+      background: var(--canvas-bg);
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    :root[data-theme="light"] canvas {
+      border-color: #cbd5e1;
+    }
+
     #msg {
       margin-top: 8px;
-      font-size: 13px;
-      color: #b00;
+      font-size: 12px;
+      color: #ffb74d;
+    }
+
+    :root[data-theme="light"] #msg {
+      color: #b45309;
+    }
+
+    footer {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h2>QuadRico – Générateur de quadrillage</h2>
+  <header class="header">
+    <div class="logo-mark">
+      <div class="logo-cell logo-yellow"></div>
+      <div class="logo-cell logo-blue"></div>
+      <div class="logo-cell logo-green"></div>
+      <div class="logo-cell logo-red"></div>
+    </div>
+    <div class="logo-text">
+      <div class="logo-text-main">QuadRico</div>
+      <div class="logo-text-sub">Générateur de quadrillage tactique</div>
+    </div>
+  </header>
 
-  <div class="controls">
-    <label>
-      Image :
-      <input type="file" id="imageLoader" accept="image/*">
-    </label>
+  <div class="top-bar-main">
+    <div id="contactInfo" class="contact-info"></div>
 
-    <label>
-      Colonnes :
-      <input type="number" id="cols" value="10" min="1" style="width:60px">
-    </label>
+    <div class="system-icons">
+      <button id="themeToggle" class="top-icon-btn" aria-label="Basculer mode jour/sombre">
+        <span class="theme-toggle-icon">☯</span>
+      </button>
+      <button id="orientationToggle" class="top-icon-btn" aria-label="Portrait / Paysage">
+        🖼️↕
+      </button>
+      <button id="fullscreenToggle" class="top-icon-btn" aria-label="Basculer plein écran">
+        ⛶
+      </button>
+      <button id="briefingBtn" class="top-icon-btn briefing" aria-label="Mode briefing">
+        🎬
+      </button>
+      <button id="printBtn" class="top-icon-btn printA4" aria-label="Imprimer A4">
+        🖨 A4
+      </button>
+      <button id="printA3Btn" class="top-icon-btn printA3" aria-label="Imprimer A3">
+        🖨 A3
+      </button>
+      <button id="downloadBtn" class="top-icon-btn download" aria-label="Télécharger PNG" disabled>
+        ⬇
+      </button>
+      <button id="resetBtn" class="top-icon-btn reset" aria-label="Effacer / Reset">
+        🗑
+      </button>
+      <button id="contactBtn" class="top-icon-btn contact" aria-label="Contact">
+        ✉
+      </button>
+    </div>
 
-    <label>
-      Lignes :
-      <input type="number" id="rows" value="14" min="1" style="width:60px">
-    </label>
+    <div id="iconHint" class="icon-hint"></div>
 
-    <!-- Choix du type de quadrillage -->
-    <label>
-      <input type="radio" name="gridType" value="fsi" checked>
-      Quadrillage FSI (4 couleurs)
-    </label>
-    <label>
-      <input type="radio" name="gridType" value="uni">
-      Quadrillage uni (rouge)
-    </label>
-
-    <!-- Option codes dans les cases -->
-    <label>
-      <input type="checkbox" id="showLabels">
-      Afficher le code dans chaque case (A1, B3…)
-    </label>
-
-    <button id="drawBtn">Appliquer le quadrillage</button>
-    <button id="downloadBtn" disabled>Télécharger PNG</button>
+    <div class="source-zoom-row">
+      <div class="source-box">
+        <strong>Source</strong>
+        <label>
+          <span>Image :</span>
+          <input type="file" id="imageLoader" accept="image/*">
+        </label>
+      </div>
+      <div class="zoom-box">
+        <strong>Zoom & vue</strong>
+        <label>
+          <span>Zoom :</span>
+          <span>
+            <input type="range" id="zoomRange" min="50" max="300" value="100">
+            <span id="zoomValue">100%</span>
+          </span>
+        </label>
+      </div>
+    </div>
   </div>
 
-  <div id="msg"></div>
-  <canvas id="canvas"></canvas>
+  <div class="main-layout">
+    <div class="canvas-wrapper">
+      <div class="toolbar-main">
+        <button id="undoBtn" class="undo-redo-btn" title="Retour en arrière">
+          ↩
+        </button>
+        <button id="redoBtn" class="undo-redo-btn" title="Retour en avant">
+          ↪
+        </button>
+        <button id="drawBtn">
+          APPLIQUER
+        </button>
+        <button id="undoDeleteBtn">
+          SUPPRIMER
+        </button>
+      </div>
+
+      <div class="canvas-scroll">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div id="msg"></div>
+    </div>
+
+    <div class="side-panel">
+      <div class="controls">
+        <div class="group">
+          <strong>Paramètres de grille :</strong>
+          <label>
+            <span>Grille sans image</span>
+            <input type="checkbox" id="gridOnly">
+          </label>
+          <label>
+            <span>Colonnes :</span>
+            <input type="number" id="cols" value="10" min="1">
+          </label>
+          <label>
+            <span>Lignes :</span>
+            <input type="number" id="rows" value="14" min="1">
+          </label>
+        </div>
+
+        <div class="group">
+          <strong>Légende :</strong>
+          <label>
+            <span>Pas de légende</span>
+            <input type="radio" name="legendMode" value="none">
+          </label>
+          <label>
+            <span>Légende partielle</span>
+            <input type="radio" name="legendMode" value="partial">
+          </label>
+          <label>
+            <span>Légende totale (4 côtés)</span>
+            <input type="radio" name="legendMode" value="full" checked>
+          </label>
+        </div>
+
+        <div class="group">
+          <strong>Choix du type de quadrillage :</strong>
+          <label>
+            <span>Aucun</span>
+            <input type="radio" name="gridType" value="none">
+          </label>
+          <label>
+            <span>Noir</span>
+            <input type="radio" name="gridType" value="uni-black">
+          </label>
+          <label>
+            <span>Rouge</span>
+            <input type="radio" name="gridType" value="uni-red">
+          </label>
+          <label>
+            <span>FSI (4 couleurs)</span>
+            <input type="radio" name="gridType" value="fsi" checked>
+          </label>
+        </div>
+
+        <div class="group">
+          <strong>Choix du type de code dans les cases :</strong>
+          <label>
+            <span>Aucun code</span>
+            <input type="radio" name="labelMode" value="none" checked>
+          </label>
+          <label>
+            <span>Code noir</span>
+            <input type="radio" name="labelMode" value="uni">
+          </label>
+          <label>
+            <span>Code rouge</span>
+            <input type="radio" name="labelMode" value="color">
+          </label>
+          <label>
+            <span>Code FSI</span>
+            <input type="radio" name="labelMode" value="fsi-color">
+          </label>
+        </div>
+
+        <div class="group">
+          <strong>Style des lignes :</strong>
+          <label>
+            <span>Pointillés</span>
+            <input type="checkbox" id="dashedLines">
+          </label>
+          <label>
+            <span>Croix (noir)</span>
+            <input type="checkbox" id="crossBlack">
+          </label>
+          <label>
+            <span>Croix (rouge)</span>
+            <input type="checkbox" id="crossRed">
+          </label>
+          <label>
+            <span>Croix (FSI)</span>
+            <input type="checkbox" id="crossFSI">
+          </label>
+        </div>
+
+        <div class="group">
+          <strong>Opacité :</strong>
+          <label>
+            <span>Image :</span>
+            <input type="range" id="imageOpacity" min="0" max="100" value="100">
+          </label>
+          <label>
+            <span>Quadrillage :</span>
+            <input type="range" id="gridOpacity" min="0" max="100" value="100">
+          </label>
+          <label>
+            <span>Code / Croix :</span>
+            <input type="range" id="codeOpacity" min="0" max="100" value="100">
+          </label>
+        </div>
+
+        <div class="group group-full">
+          <strong>Sélection de case :</strong>
+          <label>
+            <span>Activer la sélection de cases</span>
+            <input type="checkbox" id="selectionMode">
+          </label>
+
+          <div class="selection-modes">
+            <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
+              <span class="icon">✎</span> Appliquer
+            </button>
+            <button id="modeEraseBorder" class="selection-mode-btn" type="button" title="Effacer bordure / quadrillage">
+              <span class="icon">⬚</span> Effacer bordure
+            </button>
+            <button id="modeEraseCode" class="selection-mode-btn" type="button" title="Effacer texte / croix">
+              <span class="icon">✕</span> Effacer texte/croix
+            </button>
+          </div>
+
+          <div class="border-width-options">
+            <span class="label-title">Épaisseur du trait :</span>
+            <label>
+              <span>Normal</span>
+              <input type="radio" name="borderWidth" value="normal" checked>
+            </label>
+            <label>
+              <span>Épais</span>
+              <input type="radio" name="borderWidth" value="epais">
+            </label>
+            <label>
+              <span>Très épais</span>
+              <input type="radio" name="borderWidth" value="tres-epais">
+            </label>
+          </div>
+
+          <label>
+            <span>Couleur de bordure :</span>
+            <select id="borderColor">
+              <option value="#000000">Noir</option>
+              <option value="#ff0000">Rouge</option>
+              <option value="#0000ff">Bleu</option>
+              <option value="#00aa00">Vert</option>
+              <option value="#ffaa00">Orange</option>
+              <option value="#ffff00">Jaune</option>
+              <option value="#aa00ff">Violet</option>
+              <option value="#00ffff">Cyan</option>
+              <option value="#ff00aa">Magenta</option>
+              <option value="#ffffff">Blanc</option>
+            </select>
+          </label>
+          <label>
+            <span>Texte dans la case :</span>
+            <input type="text" id="cellText" placeholder="Ex : TO, Appui 1...">
+          </label>
+          <label>
+            <span>Couleur du texte :</span>
+            <select id="textColor">
+              <option value="">(Même que bordure)</option>
+              <option value="#000000">Noir</option>
+              <option value="#ff0000">Rouge</option>
+              <option value="#0000ff">Bleu</option>
+              <option value="#00aa00">Vert</option>
+              <option value="#ffaa00">Orange</option>
+              <option value="#ffff00">Jaune</option>
+              <option value="#aa00ff">Violet</option>
+              <option value="#00ffff">Cyan</option>
+              <option value="#ff00aa">Magenta</option>
+              <option value="#ffffff">Blanc</option>
+            </select>
+          </label>
+          <small style="font-size:11px;color:var(--text-sub); white-space:normal;">
+            Clique sur une case pour appliquer l'action choisie.<br>
+            Si un texte est défini, croix et codes sont désactivés pour cette case.<br>
+            Utilise ↩ / ↪ pour revenir en arrière ou en avant sur tes modifs.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    QuadRico – Outil libre d'utilisation, non contractuel.  
+    Générateur de quadrillage mis à disposition à titre gratuit pour un usage pédagogique.
+  </footer>
 
   <script>
-    const imageLoader = document.getElementById('imageLoader');
-    const canvas      = document.getElementById('canvas');
-    const ctx         = canvas.getContext('2d');
-    const drawBtn     = document.getElementById('drawBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const msg         = document.getElementById('msg');
-    const showLabels  = document.getElementById('showLabels');
+    const imageLoader   = document.getElementById('imageLoader');
+    const canvas        = document.getElementById('canvas');
+    const ctx           = canvas.getContext('2d');
+    const drawBtn       = document.getElementById('drawBtn');
+    const undoDeleteBtn = document.getElementById('undoDeleteBtn');
+    const downloadBtn   = document.getElementById('downloadBtn');
+    const printBtn      = document.getElementById('printBtn');
+    const printA3Btn    = document.getElementById('printA3Btn');
+    const resetBtn      = document.getElementById('resetBtn');
+    const msg           = document.getElementById('msg');
+
+    const undoBtn       = document.getElementById('undoBtn');
+    const redoBtn       = document.getElementById('redoBtn');
+
+    const contactInfo   = document.getElementById('contactInfo');
+    const iconHint      = document.getElementById('iconHint');
+
+    const dashedLines   = document.getElementById('dashedLines');
+    const crossBlack    = document.getElementById('crossBlack');
+    const crossRed      = document.getElementById('crossRed');
+    const crossFSI      = document.getElementById('crossFSI');
+
+    const gridOnly      = document.getElementById('gridOnly');
+    const imageOpacity  = document.getElementById('imageOpacity');
+    const gridOpacity   = document.getElementById('gridOpacity');
+    const codeOpacity   = document.getElementById('codeOpacity');
+
+    const zoomRange     = document.getElementById('zoomRange');
+    const zoomValue     = document.getElementById('zoomValue');
+
+    const selectionMode = document.getElementById('selectionMode');
+    const borderColorEl = document.getElementById('borderColor');
+    const textColorEl   = document.getElementById('textColor');
+    const cellTextEl    = document.getElementById('cellText');
+
+    const themeToggle   = document.getElementById('themeToggle');
+    const orientationToggle = document.getElementById('orientationToggle');
+    const fullscreenToggle  = document.getElementById('fullscreenToggle');
+    const briefingBtn   = document.getElementById('briefingBtn');
+    const contactBtn    = document.getElementById('contactBtn');
+    const root          = document.documentElement;
+
+    const modeApplyBtn       = document.getElementById('modeApply');
+    const modeEraseBorderBtn = document.getElementById('modeEraseBorder');
+    const modeEraseCodeBtn   = document.getElementById('modeEraseCode');
+
+    let selectionAction = "apply";
 
     let img = null;
 
     const MARGIN_LEFT = 40;
     const MARGIN_TOP  = 40;
 
+    let selectedCells = {};
+    let lastGridGeom = null;
+
+    let history = [];
+    let historyIndex = -1;
+
+    let orientationMode = "portrait";
+    let printOrientation = "portrait";
+
+    let briefingMode = false;
+
+    // Pour le zoom CSS
+    let baseCanvasWidth = 0;
+    let baseCanvasHeight = 0;
+
     function setMsg(text) {
       msg.textContent = text || "";
     }
 
-    // Chargement de l'image
+    function handleCrossChange(changed) {
+      if (changed.checked) {
+        if (changed !== crossBlack) crossBlack.checked = false;
+        if (changed !== crossRed)   crossRed.checked   = false;
+        if (changed !== crossFSI)   crossFSI.checked   = false;
+      }
+    }
+
+    crossBlack.addEventListener('change', () => handleCrossChange(crossBlack));
+    crossRed.addEventListener('change',   () => handleCrossChange(crossRed));
+    crossFSI.addEventListener('change',   () => handleCrossChange(crossFSI));
+
+    function getLegendMode() {
+      const r = document.querySelector('input[name="legendMode"]:checked');
+      return r ? r.value : "full";
+    }
+
+    function updateThemeButton() {
+      const current = root.getAttribute('data-theme') || 'dark';
+      const iconSpan = themeToggle.querySelector('.theme-toggle-icon');
+      iconSpan.textContent = current === 'dark' ? '☯' : '☼';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      updateThemeButton();
+    });
+
+    updateThemeButton();
+
+    function updateOrientationButton() {
+      if (orientationMode === "portrait") {
+        orientationToggle.textContent = "🖼️↕";
+        orientationToggle.title = "Mode portrait (affichage et impression)";
+      } else {
+        orientationToggle.textContent = "🖼️↔";
+        orientationToggle.title = "Mode paysage (affichage et impression)";
+      }
+      printOrientation = orientationMode;
+    }
+
+    orientationToggle.addEventListener('click', () => {
+      orientationMode = (orientationMode === "portrait") ? "landscape" : "portrait";
+      updateOrientationButton();
+      if (img || gridOnly.checked) {
+        drawGrid();
+      } else {
+        setMsg("Choisis une image ou active \"Grille sans image\" puis clique sur APPLIQUER.");
+      }
+    });
+
+    updateOrientationButton();
+
+    fullscreenToggle.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    briefingBtn.addEventListener('click', () => {
+      briefingMode = !briefingMode;
+      document.body.classList.toggle('briefing-mode', briefingMode);
+      setIconHint(
+        briefingMode
+          ? "Mode briefing : la carte est mise en avant, les réglages sont masqués."
+          : "Mode normal : réglages réaffichés."
+      );
+    });
+
+    contactBtn.addEventListener('click', () => {
+      contactInfo.textContent =
+        "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
+      window.location.href = "mailto:eric.marchetti@gendarmerie.interieur.gouv.fr";
+    });
+
+    function setIconHint(text) {
+      iconHint.textContent = text || "";
+    }
+
+    function addIconHint(btn, text) {
+      btn.addEventListener('mouseenter', () => setIconHint(text));
+      btn.addEventListener('mouseleave', () => setIconHint(""));
+    }
+
+    addIconHint(themeToggle,      "Basculer entre mode sombre et mode clair");
+    addIconHint(orientationToggle,"Basculer entre portrait et paysage (affichage & impression)");
+    addIconHint(fullscreenToggle, "Basculer en mode plein écran");
+    addIconHint(briefingBtn,      "Mode briefing : cacher les réglages, mettre la carte en avant");
+    addIconHint(printBtn,         "Imprimer / exporter en PDF A4 (portrait/paysage)");
+    addIconHint(printA3Btn,       "Imprimer / exporter en PDF A3 (portrait/paysage)");
+    addIconHint(downloadBtn,      "Télécharger l'image quadrillée en PNG");
+    addIconHint(resetBtn,         "Réinitialiser tous les réglages et effacer la grille");
+    addIconHint(contactBtn,       "Envoyer un mail au concepteur de QuadRico");
+
     imageLoader.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (!file) {
@@ -108,7 +1027,8 @@
         const image = new Image();
         image.onload = function () {
           img = image;
-          setMsg("Image chargée. Choisis colonnes / lignes puis clique sur \"Appliquer le quadrillage\".");
+          gridOnly.checked = false;
+          setMsg("Image chargée. Clique sur \"APPLIQUER\".");
           drawBase();
           downloadBtn.disabled = true;
         };
@@ -120,38 +1040,99 @@
       reader.readAsDataURL(file);
     });
 
-    // Dessine uniquement l'image de base
+    function getGridType() {
+      const r = document.querySelector('input[name="gridType"]:checked');
+      return r ? r.value : "fsi";
+    }
+
+    function getLabelMode() {
+      const r = document.querySelector('input[name="labelMode"]:checked');
+      return r ? r.value : "none";
+    }
+
+    function getCrossMode() {
+      if (crossBlack.checked) return "black";
+      if (crossRed.checked)   return "red";
+      if (crossFSI.checked)   return "fsi";
+      return "none";
+    }
+
+    function getBorderWidthPx() {
+      const r = document.querySelector('input[name="borderWidth"]:checked');
+      const v = r ? r.value : "normal";
+      if (v === "epais") return 4;
+      if (v === "tres-epais") return 6;
+      return 2;
+    }
+
+    function applyZoomScale() {
+      if (!baseCanvasWidth || !baseCanvasHeight) return;
+      const scale = zoomRange.value / 100;
+      canvas.style.width  = (baseCanvasWidth * scale) + "px";
+      canvas.style.height = (baseCanvasHeight * scale) + "px";
+      zoomValue.textContent = zoomRange.value + "%";
+    }
+
     function drawBase() {
-      if (!img) {
-        setMsg("Charge une image avant de tracer la grille.");
-        return;
+      const cols = parseInt(document.getElementById('cols').value, 10) || 10;
+      const rows = parseInt(document.getElementById('rows').value, 10) || 10;
+      const useGridOnly = gridOnly.checked;
+
+      let imgW, imgH;
+
+      if (useGridOnly || !img) {
+        const cellSize = 40;
+        imgW = cols * cellSize;
+        imgH = rows * cellSize;
+      } else {
+        if (orientationMode === "portrait") {
+          imgW = img.width;
+          imgH = img.height;
+        } else {
+          imgW = img.height;
+          imgH = img.width;
+        }
       }
-      canvas.width  = img.width  + MARGIN_LEFT;
-      canvas.height = img.height + MARGIN_TOP;
+
+      canvas.width  = imgW + 2 * MARGIN_LEFT;
+      canvas.height = imgH + 2 * MARGIN_TOP;
+
+      baseCanvasWidth = canvas.width;
+      baseCanvasHeight = canvas.height;
+      applyZoomScale();
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
-    }
-
-    // Récupère le type de quadrillage choisi
-    function getGridType() {
-      const radios = document.querySelectorAll('input[name="gridType"]');
-      for (const r of radios) {
-        if (r.checked) return r.value;
+      if (!useGridOnly) {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-      return "fsi";
+
+      const imgAlpha = parseInt(imageOpacity.value, 10) / 100;
+
+      if (!useGridOnly && img) {
+        ctx.save();
+        ctx.globalAlpha = imgAlpha;
+
+        if (orientationMode === "portrait") {
+          ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
+        } else {
+          const imgWportrait = img.width;
+          const imgHportrait = img.height;
+          ctx.translate(MARGIN_LEFT, MARGIN_TOP + imgH);
+          ctx.rotate(-Math.PI / 2);
+          ctx.drawImage(img, 0, 0);
+        }
+
+        ctx.restore();
+      }
+
+      const cellW = imgW / cols;
+      const cellH = imgH / rows;
+      lastGridGeom = { cols, rows, cellW, cellH, imgW, imgH };
     }
 
-    // Dessine la grille (FSI ou uni) + légendes
     function drawGrid() {
-      if (!img) {
-        setMsg("Charge une image avant de tracer la grille.");
-        return;
-      }
-
       const cols = parseInt(document.getElementById('cols').value, 10);
       const rows = parseInt(document.getElementById('rows').value, 10);
 
@@ -160,116 +1141,515 @@
         return;
       }
 
-      const gridType = getGridType();
+      const gridType    = getGridType();
+      const labelMode   = getLabelMode();
+      const useDashed   = dashedLines.checked;
+      const crossMode   = getCrossMode();
+      const useGridOnly = gridOnly.checked;
+      const legendMode  = getLegendMode();
 
-      setMsg("");
+      if (!useGridOnly && !img) {
+        setMsg("Charge d'abord une image ou active \"Grille sans image\".");
+        return;
+      }
+
       drawBase();
+      if (!lastGridGeom) return;
 
-      const imgW = img.width;
-      const imgH = img.height;
-      const cellW = imgW / cols;
-      const cellH = imgH / rows;
+      const { cellW, cellH, imgW, imgH, cols: C, rows: R } = lastGridGeom;
 
-      // Couleurs pour le mode FSI
-      const colorTL = 'yellow'; // haut gauche
-      const colorTR = 'blue';   // haut droite
-      const colorBR = 'green';  // bas droite
-      const colorBL = 'red';    // bas gauche
+      const midCol = C / 2;
+      const midRow = R / 2;
 
-      const midCol = cols / 2;
-      const midRow = rows / 2;
+      const colorTL = 'yellow';
+      const colorTR = 'blue';
+      const colorBR = 'green';
+      const colorBL = 'red';
+
+      const gridAlpha = parseInt(gridOpacity.value, 10) / 100;
+      const codeAlpha = parseInt(codeOpacity.value, 10) / 100;
+
+      function colorForCell(c, r) {
+        let color = "black";
+        if (gridType === "fsi") {
+          if (c < midCol && r < midRow)       color = colorTL;
+          else if (c >= midCol && r < midRow) color = colorTR;
+          else if (c >= midCol && r >= midRow)color = colorBR;
+          else                                color = colorBL;
+        } else if (gridType === "uni-red") {
+          color = "red";
+        } else if (gridType === "uni-black") {
+          color = "black";
+        } else if (gridType === "none") {
+          color = "black";
+        }
+        return color;
+      }
+
+      function isHiddenCell(c, r) {
+        const key = `${c},${r}`;
+        return selectedCells[key] && selectedCells[key].hidden;
+      }
+
+      function edgeTouchesHiddenVertical(c, r) {
+        const leftCell  = (c - 1 >= 0) ? isHiddenCell(c - 1, r) : false;
+        const rightCell = (c < C)      ? isHiddenCell(c, r)     : false;
+        return leftCell || rightCell;
+      }
+
+      function edgeTouchesHiddenHorizontal(c, r) {
+        const topCell    = (r - 1 >= 0) ? isHiddenCell(c, r - 1) : false;
+        const bottomCell = (r < R)      ? isHiddenCell(c, r)     : false;
+        return topCell || bottomCell;
+      }
 
       ctx.lineWidth = 1.5;
 
-      // Bordures colorées des cellules
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          let color;
+      if (useDashed && gridType !== "none") {
+        ctx.setLineDash([20, 10]);
+      } else {
+        ctx.setLineDash([]);
+      }
 
-          if (gridType === "uni") {
-            // Quadrillage uniforme rouge
-            color = "red";
-          } else {
-            // Quadrillage FSI 4 couleurs (par quadrants)
-            if (c < midCol && r < midRow)       color = colorTL;
-            else if (c >= midCol && r < midRow) color = colorTR;
-            else if (c >= midCol && r >= midRow)color = colorBR;
-            else                                color = colorBL;
+      if (gridType !== "none") {
+        ctx.save();
+        ctx.globalAlpha = gridAlpha;
+
+        for (let c = 0; c <= C; c++) {
+          const x = MARGIN_LEFT + c * cellW;
+          for (let r = 0; r < R; r++) {
+            if (edgeTouchesHiddenVertical(c, r)) continue;
+
+            const y1 = MARGIN_TOP + r * cellH;
+            const y2 = MARGIN_TOP + (r + 1) * cellH;
+
+            const colIndex = Math.min(c === C ? c - 1 : c, C - 1);
+            const color = colorForCell(colIndex, r);
+
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y1);
+            ctx.lineTo(x, y2);
+            ctx.stroke();
+          }
+        }
+
+        for (let r = 0; r <= R; r++) {
+          const y = MARGIN_TOP + r * cellH;
+          for (let c = 0; c < C; c++) {
+            if (edgeTouchesHiddenHorizontal(c, r)) continue;
+
+            const x1 = MARGIN_LEFT + c * cellW;
+            const x2 = MARGIN_LEFT + (c + 1) * cellW;
+
+            const rowIndex = Math.min(r === R ? r - 1 : r, R - 1);
+            const color = colorForCell(c, rowIndex);
+
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x2, y);
+            ctx.stroke();
+          }
+        }
+
+        ctx.restore();
+      }
+
+      if (legendMode !== "none") {
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "black";
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        if (legendMode === "partial" || legendMode === "full") {
+          for (let c = 0; c < C; c++) {
+            const label = String.fromCharCode(65 + c);
+            ctx.fillText(label, MARGIN_LEFT + (c + 0.5) * cellW, MARGIN_TOP / 2);
           }
 
-          ctx.strokeStyle = color;
-          const x = MARGIN_LEFT + c * cellW;
-          const y = MARGIN_TOP  + r * cellH;
-          ctx.strokeRect(x, y, cellW, cellH);
+          ctx.textAlign = "right";
+          for (let r = 0; r < R; r++) {
+            ctx.fillText((r + 1), MARGIN_LEFT - 5, MARGIN_TOP + (r + 0.5) * cellH);
+          }
+        }
+
+        if (legendMode === "full") {
+          ctx.textAlign = "center";
+          const bottomY = MARGIN_TOP + imgH + MARGIN_TOP / 2;
+          for (let c = 0; c < C; c++) {
+            const label = String.fromCharCode(65 + c);
+            ctx.fillText(label, MARGIN_LEFT + (c + 0.5) * cellW, bottomY);
+          }
+
+          ctx.textAlign = "left";
+          const rightX = MARGIN_LEFT + imgW + 5;
+          for (let r = 0; r < R; r++) {
+            ctx.fillText((r + 1), rightX, MARGIN_TOP + (r + 0.5) * cellH);
+          }
         }
       }
 
-      // Légendes axes en noir
-      ctx.fillStyle = 'black';
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      if (crossMode !== "none") {
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([]);
+        ctx.globalAlpha = codeAlpha;
 
-      // Abscisses (colonnes)
-      for (let c = 0; c < cols; c++) {
-        let label;
-        if (cols <= 26) {
-          label = String.fromCharCode(65 + c); // A, B, C...
-        } else {
-          label = (c + 1).toString();
-        }
-        const x = MARGIN_LEFT + (c + 0.5) * cellW;
-        const y = MARGIN_TOP / 2;
-        ctx.fillText(label, x, y);
-      }
+        for (let r = 0; r < R; r++) {
+          for (let c = 0; c < C; c++) {
+            const key = `${c},${r}`;
+            const sel = selectedCells[key];
+            if (sel && (sel.hidden || (sel.text && sel.text.length > 0) || sel.noCode)) continue;
 
-      // Ordonnées (lignes)
-      ctx.textAlign = 'right';
-      for (let r = 0; r < rows; r++) {
-        const label = (r + 1).toString();
-        const x = MARGIN_LEFT - 5;
-        const y = MARGIN_TOP + (r + 0.5) * cellH;
-        ctx.fillText(label, x, y);
-      }
-
-      // Labels internes type A1, B3, H5…
-      if (showLabels.checked) {
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = (cellH * 0.35) + "px sans-serif";
-
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-
-            let colName;
-            if (cols <= 26) {
-              colName = String.fromCharCode(65 + c);
-            } else {
-              colName = (c + 1).toString();
+            let color = "black";
+            if (crossMode === "black") {
+              color = "black";
+            } else if (crossMode === "red") {
+              color = "red";
+            } else if (crossMode === "fsi") {
+              if (c < midCol && r < midRow)       color = colorTL;
+              else if (c >= midCol && r < midRow) color = colorTR;
+              else if (c >= midCol && r >= midRow)color = colorBR;
+              else                                color = colorBL;
             }
 
-            const label = colName + (r + 1); // A1, B3, H5…
-
+            ctx.strokeStyle = color;
             const x = MARGIN_LEFT + (c + 0.5) * cellW;
             const y = MARGIN_TOP  + (r + 0.5) * cellH;
-            ctx.fillText(label, x, y);
+            const s = Math.max(3, Math.min(cellW, cellH) * 0.15);
+
+            ctx.beginPath();
+            ctx.moveTo(x - s, y - s);
+            ctx.lineTo(x + s, y + s);
+            ctx.moveTo(x - s, y + s);
+            ctx.lineTo(x + s, y - s);
+            ctx.stroke();
           }
         }
       }
 
+      if (labelMode !== "none") {
+        ctx.setLineDash([]);
+        ctx.globalAlpha = codeAlpha;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = (cellH * 0.35) + "px sans-serif";
+
+        const midColLabel = C / 2;
+        const midRowLabel = R / 2;
+
+        for (let r = 0; r < R; r++) {
+          for (let c = 0; c < C; c++) {
+            const key = `${c},${r}`;
+            const sel = selectedCells[key];
+            if (sel && (sel.hidden || (sel.text && sel.text.length > 0) || sel.noCode)) continue;
+
+            const label = String.fromCharCode(65 + c) + (r + 1);
+            let textColor = "black";
+
+            if (labelMode === "color") {
+              textColor = "red";
+            } else if (labelMode === "fsi-color") {
+              if (c < midColLabel && r < midRowLabel)       textColor = colorTL;
+              else if (c >= midColLabel && r < midRowLabel) textColor = colorTR;
+              else if (c >= midColLabel && r >= midRowLabel)textColor = colorBR;
+              else                                          textColor = colorBL;
+            } else if (labelMode === "uni") {
+              textColor = "black";
+            }
+
+            ctx.fillStyle = textColor;
+            ctx.fillText(
+              label,
+              MARGIN_LEFT + (c + 0.5) * cellW,
+              MARGIN_TOP  + (r + 0.5) * cellH
+            );
+          }
+        }
+      }
+
+      ctx.setLineDash([]);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (const key in selectedCells) {
+        const [cStr, rStr] = key.split(",");
+        const c = parseInt(cStr, 10);
+        const r = parseInt(rStr, 10);
+        if (isNaN(c) || isNaN(r)) continue;
+        if (!lastGridGeom) continue;
+        const { cols: C2, rows: R2, cellW, cellH } = lastGridGeom;
+        if (c < 0 || c >= C2 || r < 0 || r >= R2) continue;
+
+        const sel = selectedCells[key];
+        if (sel.hidden) continue;
+
+        const { borderColor, borderWidth, text, textColor, alpha } = sel;
+
+        const x = MARGIN_LEFT + c * cellW;
+        const y = MARGIN_TOP  + r * cellH;
+        const a = typeof alpha === "number" ? alpha : 1.0;
+        ctx.globalAlpha = a;
+
+        if (borderWidth && borderColor) {
+          ctx.lineWidth = borderWidth;
+          ctx.strokeStyle = borderColor;
+          ctx.strokeRect(x, y, cellW, cellH);
+        }
+
+        if (text && text.length > 0) {
+          const drawColor = textColor || borderColor || "#000000";
+          ctx.fillStyle = drawColor;
+          ctx.font = (cellH * 0.35) + "px sans-serif";
+          ctx.fillText(
+            text,
+            MARGIN_LEFT + (c + 0.5) * cellW,
+            MARGIN_TOP  + (r + 0.5) * cellH
+          );
+        }
+      }
+
+      ctx.globalAlpha = 1;
       downloadBtn.disabled = false;
-      setMsg("Quadrillage appliqué. Tu peux télécharger le PNG.");
+      setMsg("Quadrillage appliqué. Tu peux télécharger ou imprimer l'image.");
     }
 
     drawBtn.addEventListener('click', drawGrid);
 
-    // Téléchargement en PNG
+    function setSelectionAction(action) {
+      selectionAction = action;
+      [modeApplyBtn, modeEraseBorderBtn, modeEraseCodeBtn].forEach(btn => btn.classList.remove('active'));
+      if (action === "apply") modeApplyBtn.classList.add('active');
+      if (action === "eraseBorder") modeEraseBorderBtn.classList.add('active');
+      if (action === "eraseCode") modeEraseCodeBtn.classList.add('active');
+    }
+
+    modeApplyBtn.addEventListener('click', () => setSelectionAction("apply"));
+    modeEraseBorderBtn.addEventListener('click', () => setSelectionAction("eraseBorder"));
+    modeEraseCodeBtn.addEventListener('click', () => setSelectionAction("eraseCode"));
+
+    function pushHistory() {
+      const cloned = structuredClone(selectedCells);
+      history = history.slice(0, historyIndex + 1);
+      history.push(cloned);
+      historyIndex = history.length - 1;
+    }
+
+    function restoreFromHistory() {
+      if (historyIndex < 0 || historyIndex >= history.length) return;
+      selectedCells = structuredClone(history[historyIndex]);
+      drawGrid();
+    }
+
+    undoBtn.addEventListener('click', () => {
+      if (historyIndex > 0) {
+        historyIndex--;
+        restoreFromHistory();
+        setMsg("Retour en arrière.");
+      } else {
+        setMsg("Aucune action à annuler.");
+      }
+    });
+
+    redoBtn.addEventListener('click', () => {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        restoreFromHistory();
+        setMsg("Aucune action à rétablir.");
+      } else {
+        setMsg("Aucune action à rétablir.");
+      }
+    });
+
+    canvas.addEventListener('click', (e) => {
+      if (!selectionMode.checked) return;
+      if (!lastGridGeom) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const { cols, rows, cellW, cellH, imgW, imgH } = lastGridGeom;
+
+      if (x < MARGIN_LEFT || x > MARGIN_LEFT + imgW ||
+          y < MARGIN_TOP  || y > MARGIN_TOP  + imgH) {
+        return;
+      }
+
+      const c = Math.floor((x - MARGIN_LEFT) / cellW);
+      const r = Math.floor((y - MARGIN_TOP)  / cellH);
+      if (c < 0 || c >= cols || r < 0 || r >= rows) return;
+
+      const key = `${c},${r}`;
+
+      pushHistory();
+
+      if (selectionAction === "apply") {
+        const borderColor = borderColorEl.value;
+        const borderWidth = getBorderWidthPx();
+        const text = cellTextEl.value.trim();
+        const txtColor = textColorEl.value || "";
+        const alpha = 1.0;
+
+        selectedCells[key] = {
+          borderColor,
+          borderWidth,
+          text,
+          textColor: txtColor,
+          noCode: false,
+          hidden: false,
+          alpha
+        };
+      } else if (selectionAction === "eraseBorder") {
+        selectedCells[key] = {
+          hidden: true,
+          noCode: true
+        };
+      } else if (selectionAction === "eraseCode") {
+        if (!selectedCells[key]) {
+          selectedCells[key] = { noCode: true };
+        } else {
+          selectedCells[key].noCode = true;
+        }
+      }
+
+      drawGrid();
+    });
+
+    undoDeleteBtn.addEventListener('click', () => {
+      let changed = false;
+      for (const key in selectedCells) {
+        const cell = selectedCells[key];
+        if (!cell) continue;
+        if (cell.hidden || cell.noCode) {
+          if (!changed) pushHistory();
+          cell.hidden = false;
+          cell.noCode = false;
+          changed = true;
+        }
+      }
+      if (changed) {
+        drawGrid();
+        setMsg("Suppressions annulées (grille et codes réaffichés).");
+      } else {
+        setMsg("Aucune suppression à annuler.");
+      }
+    });
+
     downloadBtn.addEventListener('click', function () {
+      if (!canvas.width || !canvas.height) {
+        setMsg("Rien à télécharger : applique un quadrillage d'abord.");
+        return;
+      }
       const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'image_quadrillage.png';
+      link.href = canvas.toDataURL("image/png");
+      link.download = "image_quadrillage.png";
       link.click();
+    });
+
+    function printWithSize(pageSize) {
+      if (!canvas.width || !canvas.height) {
+        setMsg("Rien à imprimer : applique un quadrillage d'abord.");
+        return;
+      }
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        setMsg("Impossible d'ouvrir la fenêtre d'impression (popup bloquée ?).");
+        return;
+      }
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>QuadRico - Impression</title>
+            <style>
+              @page { size: ${pageSize} ${printOrientation}; margin: 10mm; }
+              body {
+                margin: 0;
+                padding: 0;
+                text-align: center;
+              }
+              img {
+                max-width: 100%;
+                max-height: 95vh;
+                width: auto;
+                height: auto;
+              }
+            </style>
+          </head>
+          <body>
+            <img src="${dataUrl}" />
+            <script>
+              window.onload = function() {
+                window.focus();
+                window.print();
+              };
+            <\/script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    printBtn.addEventListener('click', () => printWithSize("A4"));
+    printA3Btn.addEventListener('click', () => printWithSize("A3"));
+
+    resetBtn.addEventListener('click', function () {
+      document.getElementById('cols').value = 10;
+      document.getElementById('rows').value = 14;
+
+      document.querySelector('input[name="gridType"][value="fsi"]').checked = true;
+      document.querySelector('input[name="legendMode"][value="full"]').checked = true;
+      document.querySelector('input[name="labelMode"][value="none"]').checked = true;
+
+      dashedLines.checked = false;
+      crossBlack.checked  = false;
+      crossRed.checked    = false;
+      crossFSI.checked    = false;
+
+      gridOnly.checked = false;
+      imageOpacity.value = 100;
+      gridOpacity.value = 100;
+      codeOpacity.value = 100;
+
+      zoomRange.value = 100;
+      zoomValue.textContent = "100%";
+      baseCanvasWidth = 0;
+      baseCanvasHeight = 0;
+      canvas.style.width  = "";
+      canvas.style.height = "";
+
+      selectionMode.checked = false;
+      setSelectionAction("apply");
+      borderColorEl.value = "#000000";
+      textColorEl.value = "";
+      cellTextEl.value = "";
+
+      selectedCells = {};
+      history = [];
+      historyIndex = -1;
+
+      imageLoader.value = "";
+      img = null;
+      lastGridGeom = null;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      downloadBtn.disabled = true;
+
+      orientationMode = "portrait";
+      updateOrientationButton();
+
+      briefingMode = false;
+      document.body.classList.remove('briefing-mode');
+
+      setMsg("Réinitialisé. Charge une nouvelle image ou active \"Grille sans image\" pour recommencer.");
+    });
+
+    zoomRange.addEventListener('input', () => {
+      applyZoomScale();
     });
   </script>
 </body>
