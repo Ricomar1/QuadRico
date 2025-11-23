@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>QuadRico – Générateur de quadrillage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* PALETTES THÈME */
 
@@ -335,7 +336,7 @@
     }
 
     .canvas-scroll {
-      overflow: visible;     /* pas de scroll interne par défaut (100%) */
+      overflow: visible; /* pas de scroll interne par défaut (≤112%) */
       border-radius: 8px;
     }
 
@@ -343,9 +344,8 @@
       flex: 0 0 480px;
       max-width: 500px;
       align-self: flex-start;
-
       position: sticky;
-      top: 0;               /* aligné avec la toolbar */
+      top: 0;
       z-index: 400;
     }
 
@@ -357,10 +357,10 @@
       flex: 1 1 auto;
     }
 
-    /* BLOC OPTIONS (pas de scroll interne) */
+    /* BLOC OPTIONS (2 colonnes asymétriques) */
     .controls {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
       gap: 8px;
       background: var(--bg-panel);
       padding: 10px 12px;
@@ -528,6 +528,7 @@
       margin-top: 12px;
       background: var(--canvas-bg);
       transition: background 0.25s ease, border-color 0.25s ease;
+      max-width: 100%;
     }
 
     :root[data-theme="light"] canvas {
@@ -550,6 +551,48 @@
       color: var(--text-sub);
       text-align: center;
     }
+
+    /* ===================== RESPONSIVE TÉLÉPHONE ===================== */
+
+    @media (max-width: 900px) {
+      body {
+        margin: 10px;
+      }
+      .main-layout {
+        flex-direction: column;
+      }
+      .side-panel {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 10px;
+      }
+      .controls {
+        grid-template-columns: 1fr; /* options en 1 colonne sur mobile */
+      }
+      .canvas-wrapper {
+        width: 100%;
+      }
+      .toolbar-main {
+        top: 0;
+        border-radius: 10px;
+      }
+      .source-zoom-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .source-box,
+      .zoom-box {
+        width: 100%;
+      }
+      .system-icons {
+        justify-content: center;
+      }
+      canvas {
+        height: auto;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -699,8 +742,7 @@
           </label>
         </div>
 
-        <!-- ICI : élargi en group-full -->
-        <div class="group group-full">
+        <div class="group">
           <strong>Choix du type de code dans les cases :</strong>
           <label>
             <span>Aucun code</span>
@@ -1063,14 +1105,15 @@
 
     function applyZoomScale() {
       if (!baseCanvasWidth || !baseCanvasHeight) return;
-      const scale = zoomRange.value / 100;
+      const zoom = parseInt(zoomRange.value, 10);
+      const scale = zoom / 100;
       canvas.style.width  = (baseCanvasWidth * scale) + "px";
       canvas.style.height = (baseCanvasHeight * scale) + "px";
-      zoomValue.textContent = zoomRange.value + "%";
+      zoomValue.textContent = zoom + "%";
 
       const scrollContainer = document.querySelector('.canvas-scroll');
       if (scrollContainer) {
-        if (scale > 1) {
+        if (zoom >= 113) {
           scrollContainer.style.maxHeight = '80vh';
           scrollContainer.style.overflow = 'auto';
         } else {
@@ -1124,8 +1167,6 @@
         if (orientationMode === "portrait") {
           ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
         } else {
-          const imgHportrait = img.height;
-          const imgWportrait = img.width;
           ctx.translate(MARGIN_LEFT, MARGIN_TOP + imgH);
           ctx.rotate(-Math.PI / 2);
           ctx.drawImage(img, 0, 0);
