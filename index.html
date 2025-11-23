@@ -577,6 +577,8 @@
       body {
         margin: 10px;
       }
+
+      /* layout général */
       .main-layout {
         flex-direction: column;
       }
@@ -586,28 +588,60 @@
         max-width: 100%;
         margin-top: 10px;
       }
-      .controls {
-        grid-template-columns: 1fr; /* options en 1 colonne sur mobile */
-      }
       .canvas-wrapper {
         width: 100%;
       }
+
+      /* Zoom : caché sur mobile */
+      .zoom-box {
+        display: none;
+      }
+
+      /* bloc options : une colonne + léger "dézoom" visuel */
+      .controls {
+        grid-template-columns: 1fr;
+        transform: scale(0.95);
+        transform-origin: top center;
+      }
+
+      /* Toolbar : retours + supprimer en haut, APPLIQUER seul en dessous */
       .toolbar-main {
         top: 0;
         border-radius: 10px;
+        justify-content: center;
       }
+      .toolbar-main #undoBtn,
+      .toolbar-main #redoBtn,
+      .toolbar-main #undoDeleteBtn {
+        order: 1;
+      }
+      .toolbar-main #drawBtn {
+        order: 2;
+        flex-basis: 100%;
+        max-width: 230px;
+        justify-content: center;
+      }
+
       .source-zoom-row {
         flex-direction: column;
         align-items: stretch;
       }
       .source-box,
-      .zoom-box,
       .mid-box {
         width: 100%;
       }
+
       .system-icons {
         justify-content: center;
       }
+
+      label {
+        font-size: 12px;
+      }
+      .group {
+        font-size: 12px;
+      }
+
       canvas {
         height: auto;
       }
@@ -728,11 +762,11 @@
         <button id="redoBtn" class="undo-redo-btn" title="Retour en avant">
           ↪
         </button>
-        <button id="drawBtn">
-          APPLIQUER
-        </button>
         <button id="undoDeleteBtn">
           SUPPRIMER
+        </button>
+        <button id="drawBtn">
+          APPLIQUER
         </button>
       </div>
 
@@ -1371,7 +1405,7 @@
       if (legendMode !== "none") {
         ctx.setLineDash([]);
         ctx.globalAlpha = 1;
-        ctx.fillStyle = useGridOnly ? "#ffffff" : "black";  // Blanc sur grille sans image
+        ctx.fillStyle = useGridOnly ? "#ffffff" : "black";
         ctx.font = "16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
