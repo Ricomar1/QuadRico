@@ -1272,7 +1272,7 @@
           <li><strong>Fusionner / Fractionner</strong> : créer ou casser des blocs multi-cases.</li>
           <li><strong>Réinitialiser la case</strong> : revient à la case d’origine.</li>
           <li><strong>Ctrl + C / Ctrl + V</strong> : copie / colle le style d’une case (bordure, texte, zone…).</li>
-          <li><strong>Suppr (Delete)</strong> : réinitialise la dernière case cliquée.</li>
+          <li><strong>Suppr (Delete)</strong> : réinitialiser la dernière case cliquée.</li>
         </ul>
       </details>
 
@@ -3241,13 +3241,17 @@
 
     mapsOpenBtn.addEventListener('click', () => {
       const addr = (mapsAddress.value || "").trim();
+      let url;
       if (!addr) {
-        setMsg("Saisis une adresse avant d'ouvrir Google Maps.");
-        return;
+        // Aucun texte : ouvrir Google Maps "vide"
+        url = "https://www.google.com/maps/";
+        setMsg("Ouverture de Google Maps.");
+      } else {
+        // Adresse saisie : ouvrir la recherche sur cette adresse
+        url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
+        setMsg("Ouverture de Google Maps avec l'adresse saisie.");
       }
-      const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
       window.open(url, "_blank");
-      setMsg("Ouverture de Google Maps avec l'adresse saisie.");
     });
 
     /* ==== INIT ==== */
