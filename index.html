@@ -601,7 +601,7 @@
     }
 
     canvas {
-      border: 1px solid #3a4158;
+      border: 1.5px solid #3a4158;
       display: block;
       margin-top: 12px;
       background: var(--canvas-bg);
@@ -773,7 +773,8 @@
       .toolbar-main #undoBtn,
       .toolbar-main #redoBtn,
       .toolbar-main #undoDeleteBtn,
-      .toolbar-main #autoRefreshBtn {
+      .toolbar-main #autoRefreshBtn,
+      .toolbar-main #optionsToggle {
         order: 1;
       }
       .toolbar-main #drawBtn {
@@ -870,15 +871,12 @@
       <button id="contactBtn" class="top-icon-btn contact" aria-label="Contact">
         ✉
       </button>
-      <button id="optionsToggle" class="top-icon-btn" aria-label="Afficher / masquer les options">
-        ⚙ Options
-      </button>
     </div>
 
     <div id="iconHint" class="icon-hint"></div>
 
     <div class="source-zoom-row">
-      <!-- SOURCE avec Google Maps + grille -->
+      <!-- SOURCE -->
       <div class="source-box">
         <strong>Source</strong>
         <label>
@@ -900,7 +898,7 @@
         </label>
       </div>
 
-      <!-- Feuilles dans le même bandeau -->
+      <!-- Feuilles -->
       <div class="mid-box">
         <strong>Feuilles</strong>
         <label>
@@ -976,9 +974,12 @@
         <button id="autoRefreshBtn" class="undo-redo-btn" title="Rafraîchissement auto">
           ⟳ AUTO
         </button>
+        <button id="optionsToggle" class="undo-redo-btn" aria-label="Afficher / masquer les options">
+          ⚙
+        </button>
       </div>
 
-      <!-- checkbox technique cachée pour la logique -->
+      <!-- checkbox technique autoRefresh cachée -->
       <input type="checkbox" id="autoRefresh" style="display:none;">
 
       <div class="canvas-scroll">
@@ -1075,7 +1076,7 @@
             <button id="modeEraseBorder" class="selection-mode-btn" type="button" title="Effacer bordure / quadrillage">
               <span class="icon">⬚</span> Effacer bordure
             </button>
-            <button id="modeEraseCode" class="selection-mode-btn" type="button" title="Effacer texte / croix">
+            <button id="modeEraseCode" class="selection-mode-btn" type="button" title="Effacer texte/croix">
               <span class="icon">✕</span> Effacer texte/croix
             </button>
           </div>
@@ -1111,6 +1112,7 @@
           <label>
             <span>Couleur de bordure :</span>
             <select id="borderColor">
+              <option value="none">(néant)</option>
               <option value="#000000">Noir</option>
               <option value="#ff0000">Rouge</option>
               <option value="#0000ff">Bleu</option>
@@ -1146,7 +1148,7 @@
           <label>
             <span>Couleur de zone :</span>
             <select id="fillColor">
-              <option value="">(Aucune)</option>
+              <option value="none">(néant)</option>
               <option value="rgba(255,0,0,0.6)">Rouge</option>
               <option value="rgba(0,128,0,0.6)">Vert</option>
               <option value="rgba(0,0,255,0.6)">Bleu</option>
@@ -1168,7 +1170,9 @@
             Utilise ↩ / ↪ ou <strong>Ctrl + Z</strong> pour revenir en arrière.<br>
             Utilise <strong>Ctrl + C / Ctrl + V</strong> pour copier / coller le style de la dernière case cliquée.<br>
             Touche <strong>Entrée</strong> = bouton <strong>APPLIQUER</strong>.<br>
-            Touche <strong>Suppr (Delete)</strong> = réinitialiser la dernière case cliquée.
+            Touche <strong>Suppr (Delete)</strong> = réinitialiser la dernière case cliquée.<br>
+            Pour supprimer une zone colorée : mets <strong>Couleur de zone = (néant)</strong> puis clique sur la case.<br>
+            Pour revenir à la couleur du quadrillage : mets <strong>Couleur de bordure = (néant)</strong> puis clique sur la case.
           </small>
         </div>
       </div>
@@ -1207,7 +1211,7 @@
         <summary>1. Source & affichage</summary>
         <ul>
           <li><strong>Image</strong> : importe une photo (satellite, plan, croquis, etc.).</li>
-          <li><strong>Adresse Google Maps</strong> : sais une adresse ou un lieu (10 Rue ..., ville) puis clique sur 🔍 pour ouvrir Google Maps dans un nouvel onglet.</li>
+          <li><strong>Adresse Google Maps</strong> : saisis une adresse ou un lieu puis 🔍 pour ouvrir dans un nouvel onglet.</li>
           <li><strong>Grille sans image</strong> : quadrillage seul (fond noir / blanc selon le thème).</li>
         </ul>
       </details>
@@ -1216,22 +1220,9 @@
         <summary>2. Quadrillage & légende</summary>
         <ul>
           <li><strong>Colonnes / Lignes</strong> : taille de la grille (A1, B3, …).</li>
-          <li><strong>Quadrillage</strong> :
-            <ul>
-              <li><em>Aucun</em> : pas de quadrillage.</li>
-              <li><em>Noir / Rouge</em> : quadrillage uni.</li>
-              <li><em>FSI</em> : quadrillage en 4 couleurs (quadrants).</li>
-            </ul>
-          </li>
-          <li><strong>Légende</strong> :
-            <ul>
-              <li><em>Pas de légende</em> : aucune lettre / chiffre autour.</li>
-              <li><em>Partielle</em> : lettres en haut, chiffres à gauche.</li>
-              <li><em>Totale</em> : lettres en haut / bas, chiffres à gauche / droite.</li>
-            </ul>
-          </li>
-          <li><strong>Rafraîchissement auto (⟳ AUTO)</strong> : bouton à droite de <strong>APPLIQUER</strong>.  
-            Quand il est activé, la carte se met à jour automatiquement dès que tu modifies un paramètre (sinon, tu dois cliquer sur <strong>APPLIQUER</strong>).</li>
+          <li><strong>Quadrillage</strong> : aucun / noir / rouge / FSI.</li>
+          <li><strong>Légende</strong> : pas de légende / partielle / totale (4 côtés).</li>
+          <li><strong>Rafraîchissement auto (⟳ AUTO)</strong> : si activé, la carte se met à jour dès que tu modifies un paramètre.</li>
           <li>Les colonnes suivent la logique <strong>A, B, …, Z, AA, AB, …</strong>.</li>
         </ul>
       </details>
@@ -1239,85 +1230,87 @@
       <details>
         <summary>3. Codes, croix & zones colorées</summary>
         <ul>
-          <li><strong>Type de code</strong> :
+          <li><strong>Type de code</strong> : aucun / noir / rouge / FSI.</li>
+          <li><strong>Croix</strong> : noir, rouge ou FSI (une seule couleur à la fois).</li>
+          <li><strong>Couleur de zone</strong> :
             <ul>
-              <li><em>Aucun</em> : cases vides.</li>
-              <li><em>Noir / Rouge</em> : code simple A1, B3… d'une seule couleur.</li>
-              <li><em>FSI</em> : couleur du code selon le quadrant.</li>
+              <li><em>(néant)</em> : aucune zone colorée (efface la zone sur la case).</li>
+              <li>Couleur (rouge, vert, …) : zone colorée semi-transparente.</li>
             </ul>
           </li>
-          <li><strong>Croix</strong> : coche une seule couleur de croix (noir, rouge ou FSI).</li>
-          <li><strong>Zones colorées</strong> :
-            <ul>
-              <li>Choisis une <strong>couleur de zone</strong> et une <strong>opacité</strong>.</li>
-              <li>En mode <em>Appliquer</em>, clique dans les cases pour teinter la zone (secteurs, zones d'appui, etc.).</li>
-            </ul>
-          </li>
+          <li><strong>Opacité de zone</strong> : transparence de la zone colorée.</li>
         </ul>
       </details>
 
       <details>
-        <summary>4. Travail par case</summary>
+        <summary>4. Bordures & texte</summary>
         <ul>
-          <li>Les actions se font <strong>directement en cliquant sur la case</strong> :</li>
-          <li><strong>Appliquer</strong> :
+          <li><strong>Couleur de bordure</strong> :
             <ul>
-              <li>Dessine une bordure (couleur / épaisseur).</li>
-              <li>Ajoute un texte personnalisé.</li>
-              <li>Applique une zone colorée.</li>
+              <li><em>(néant)</em> : supprime la couleur personnalisée et revient à la <strong>couleur du quadrillage de base</strong> pour la case.</li>
+              <li>Couleur (noir, rouge, …) : bordure forcée dans cette couleur.</li>
             </ul>
           </li>
-          <li><strong>Effacer bordure</strong> : supprime le trait de la case (ou du bloc fusionné).</li>
-          <li><strong>Effacer texte/croix</strong> : enlève texte + codes + croix pour cette case / zone.</li>
-          <li><strong>Fusionner</strong> : regroupe plusieurs cases en une seule zone (bordure + texte unique).</li>
-          <li><strong>Fractionner</strong> : retire une case d'une zone fusionnée.</li>
-          <li><strong>Réinitialiser</strong> : remet une case comme à l'origine.</li>
-          <li><strong>Copier / coller un style</strong> :
+          <li><strong>Épaisseur</strong> :
             <ul>
-              <li>Clique sur une case, puis <strong>Ctrl + C</strong> pour copier son style (bordure, texte, couleur, zone, etc.).</li>
-              <li>Clique sur la case cible, puis <strong>Ctrl + V</strong> pour coller ce style.</li>
+              <li><em>Normal</em> : même épaisseur que le quadrillage de base.</li>
+              <li><em>Épais / Très épais</em> : traits plus visibles pour marquer une zone.</li>
             </ul>
           </li>
-          <li><strong>Suppr (Delete)</strong> : réinitialise la dernière case cliquée (équivalent de l'action “Réinitialiser la case”).</li>
+          <li><strong>Texte dans la case</strong> : TO, Appui 1, G1, etc.  
+              Si du texte est présent, les codes/croix automatiques sont désactivés sur la case.</li>
         </ul>
       </details>
 
       <details>
-        <summary>5. Onglets / feuilles</summary>
+        <summary>5. Travail par case</summary>
         <ul>
-          <li><strong>Feuille</strong> : menu déroulant dans le bandeau (à côté de SOURCE).</li>
-          <li><strong>＋</strong> : ajoute une nouvelle feuille <em>sans copier l'image</em> (tu peux charger une autre carte).</li>
-          <li><strong>✎</strong> : renomme la feuille.</li>
-          <li><strong>⧉</strong> : crée une feuille copiée depuis la <strong>feuille affichée actuellement</strong> (scénario + image).</li>
-          <li><strong>🗑</strong> : supprime la feuille (sauf s'il n'en reste qu'une).</li>
+          <li>Clique directement sur une case pour appliquer l'action :</li>
+          <li><strong>Appliquer</strong> : bordure + texte + zone colorée selon les réglages.</li>
+          <li><strong>Effacer bordure</strong> : supprime le trait (ou le trait du bloc fusionné).</li>
+          <li><strong>Effacer texte/croix</strong> : supprime texte, codes et croix.</li>
+          <li><strong>Fusionner / Fractionner</strong> : créer ou casser des blocs multi-cases.</li>
+          <li><strong>Réinitialiser la case</strong> : revient à la case d’origine.</li>
+          <li><strong>Ctrl + C / Ctrl + V</strong> : copie / colle le style d’une case (bordure, texte, zone…).</li>
+          <li><strong>Suppr (Delete)</strong> : réinitialise la dernière case cliquée.</li>
         </ul>
       </details>
 
       <details>
-        <summary>6. Export & briefing (icônes du haut)</summary>
+        <summary>6. Onglets / feuilles</summary>
         <ul>
-          <li><strong>☯</strong> : thème sombre / clair.</li>
-          <li><strong>🖼️↕ / 🖼️↔</strong> : portrait / paysage (affichage et impression).</li>
+          <li><strong>Feuille</strong> : menu déroulant dans le bandeau.</li>
+          <li><strong>＋</strong> : nouvelle feuille, sans image (tu peux charger une autre carte).</li>
+          <li><strong>✎</strong> : renommer la feuille.</li>
+          <li><strong>⧉</strong> : duplique la feuille affichée (image + scénario).</li>
+          <li><strong>🗑</strong> : supprime la feuille (sauf la dernière).</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>7. Export & briefing (icônes du haut)</summary>
+        <ul>
+          <li><strong>☯</strong> : mode sombre / clair.</li>
+          <li><strong>🖼️↕ / 🖼️↔</strong> : portrait / paysage.</li>
           <li><strong>⛶</strong> : plein écran.</li>
-          <li><strong>🎬</strong> : mode briefing (la carte seule, sans les options).</li>
-          <li><strong>💾</strong> : enregistre l'image en <strong>PNG</strong>.</li>
-          <li><strong>📂</strong> : charge un scénario <strong>.json</strong>.</li>
-          <li><strong>⬇</strong> : télécharge le scénario <strong>JSON</strong> (paramètres + grille).</li>
+          <li><strong>🎬</strong> : mode briefing (affiche uniquement la carte).</li>
+          <li><strong>💾</strong> : enregistre l’image en PNG.</li>
+          <li><strong>📂</strong> : charge un scénario JSON.</li>
+          <li><strong>⬇</strong> : télécharge le scénario JSON.</li>
           <li><strong>🖨 A4 / 🖨 A3</strong> : impression PDF A4 / A3.</li>
-          <li><strong>🗑</strong> : réinitialise tous les réglages après confirmation.</li>
-          <li><strong>✉</strong> : contact mail vers le concepteur.</li>
+          <li><strong>🗑</strong> : reset complet après confirmation.</li>
+          <li><strong>✉</strong> : mail de contact.</li>
         </ul>
-        <p><strong>Astuce :</strong> sur la carte, tu peux utiliser <strong>Ctrl + molette</strong> pour zoomer.</p>
       </details>
 
       <details>
-        <summary>7. Raccourcis clavier</summary>
+        <summary>8. Raccourcis clavier</summary>
         <ul>
-          <li><strong>Entrée</strong> : équivalent du bouton <strong>APPLIQUER</strong>.</li>
-          <li><strong>Ctrl + Z</strong> : annuler la dernière modification.</li>
+          <li><strong>Entrée</strong> : APPLIQUER.</li>
+          <li><strong>Ctrl + Z</strong> : annuler.</li>
           <li><strong>Ctrl + C</strong> : copier le style de la dernière case cliquée.</li>
           <li><strong>Ctrl + V</strong> : coller le style copié sur la dernière case cliquée.</li>
-          <li><strong>Ctrl + molette</strong> : zoomer / dézoomer sur la carte.</li>
+          <li><strong>Ctrl + molette</strong> : zoom sur la carte.</li>
           <li><strong>Suppr (Delete)</strong> : réinitialiser la dernière case cliquée.</li>
         </ul>
       </details>
@@ -1454,6 +1447,11 @@
       return s;
     }
 
+    function getLegendMode() {
+      const r = document.querySelector('input[name="legendMode"]:checked');
+      return r ? r.value : "full";
+    }
+
     function handleCrossChange(changed) {
       if (changed.checked) {
         if (changed !== crossBlack) crossBlack.checked = false;
@@ -1465,11 +1463,6 @@
     crossBlack.addEventListener('change', () => { handleCrossChange(crossBlack); autoRedrawIfEnabled(); });
     crossRed.addEventListener('change',   () => { handleCrossChange(crossRed);   autoRedrawIfEnabled(); });
     crossFSI.addEventListener('change',   () => { handleCrossChange(crossFSI);   autoRedrawIfEnabled(); });
-
-    function getLegendMode() {
-      const r = document.querySelector('input[name="legendMode"]:checked');
-      return r ? r.value : "full";
-    }
 
     function updateThemeButton() {
       const current = root.getAttribute('data-theme') || 'dark';
@@ -1642,9 +1635,9 @@
     function getBorderWidthPx() {
       const r = document.querySelector('input[name="borderWidth"]:checked');
       const v = r ? r.value : "normal";
-      if (v === "epais") return 4;
-      if (v === "tres-epais") return 6;
-      return 2;
+      if (v === "epais") return 3;
+      if (v === "tres-epais") return 5;
+      return 1.5; // même épaisseur que le quadrillage de base
     }
 
     function applyZoomScale() {
@@ -1675,8 +1668,6 @@
         }
       }
     }
-
-    let imgSizeCache = null;
 
     function drawBase() {
       const cols = parseInt(document.getElementById('cols').value, 10) || 10;
@@ -1738,7 +1729,29 @@
       const cellW = imgW / cols;
       const cellH = imgH / rows;
       lastGridGeom = { cols, rows, cellW, cellH, imgW, imgH };
-      imgSizeCache = { imgW, imgH };
+    }
+
+    /* Couleur de base du quadrillage pour une case (pour bordure = (néant)) */
+    function getGridBaseColorForCell(c, r) {
+      if (!lastGridGeom) return "#000000";
+      const { cols, rows } = lastGridGeom;
+      const gridType = getGridType();
+      const midCol = cols / 2;
+      const midRow = rows / 2;
+      const colorTL = 'yellow';
+      const colorTR = 'blue';
+      const colorBR = 'green';
+      const colorBL = 'red';
+
+      if (gridType === "fsi") {
+        if (c < midCol && r < midRow)       return colorTL;
+        if (c >= midCol && r < midRow)      return colorTR;
+        if (c >= midCol && r >= midRow)     return colorBR;
+        return colorBL;
+      }
+      if (gridType === "uni-red")   return "red";
+      if (gridType === "uni-black") return "black";
+      return "#000000";
     }
 
     function findRegionByCell(c, r) {
@@ -1792,11 +1805,6 @@
       }
 
       ctx.restore();
-    }
-
-    function getLegendMode() {
-      const r = document.querySelector('input[name="legendMode"]:checked');
-      return r ? r.value : "full";
     }
 
     function drawGrid() {
@@ -2370,24 +2378,40 @@
 
       pushHistory();
 
+      const fillValue = fillColorEl.value; // "none" ou couleur rgba(...)
+      const fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
+
       if (selectionAction === "apply") {
-        const borderColor = borderColorEl.value;
+        const borderChoice = borderColorEl.value; // "none" ou couleur
         const borderWidth = getBorderWidthPx();
         const text = cellTextEl.value.trim();
         const txtColor = textColorEl.value || "";
         const alpha = 1.0;
 
-        const fillColor = fillColorEl.value || "";
-        const fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
+        let effectiveBorderColor;
+        if (borderChoice === "none") {
+          // (néant) = couleur du quadrillage de base (et supprime la couleur personnalisée précédente)
+          effectiveBorderColor = getGridBaseColorForCell(c, r);
+        } else {
+          effectiveBorderColor = borderChoice;
+        }
 
+        // Gestion couleur de zone
         if (regionHere) {
-          regionHere.borderColor = borderColor;
+          // REGION fusionnée
+          regionHere.borderColor = effectiveBorderColor;
           regionHere.borderWidth = borderWidth;
-          regionHere.text       = text;
-          regionHere.textColor  = txtColor;
-          regionHere.alpha      = alpha;
-          regionHere.fillColor  = fillColor || null;
-          regionHere.fillAlpha  = fillColor ? fillAlpha : null;
+          regionHere.text        = text;
+          regionHere.textColor   = txtColor;
+          regionHere.alpha       = alpha;
+
+          if (fillValue === "none") {
+            regionHere.fillColor = null;
+            regionHere.fillAlpha = null;
+          } else {
+            regionHere.fillColor = fillValue;
+            regionHere.fillAlpha = fillAlpha;
+          }
 
           for (const cell of regionHere.cells) {
             const k = `${cell.c},${cell.r}`;
@@ -2397,17 +2421,29 @@
           }
         } else {
           const existing = selectedCells[key] || {};
+
+          let newFillColor = (typeof existing.fillColor !== "undefined") ? existing.fillColor : null;
+          let newFillAlpha = (typeof existing.fillAlpha === "number") ? existing.fillAlpha : null;
+
+          if (fillValue === "none") {
+            newFillColor = null;
+            newFillAlpha = null;
+          } else {
+            newFillColor = fillValue;
+            newFillAlpha = fillAlpha;
+          }
+
           selectedCells[key] = {
             ...existing,
-            borderColor,
-            borderWidth,
+            borderColor: effectiveBorderColor,
+            borderWidth: borderWidth,
             text,
             textColor: txtColor,
             noCode: text.length > 0,
             noGrid: false,
             alpha,
-            fillColor: fillColor || existing.fillColor || null,
-            fillAlpha: fillColor ? fillAlpha : existing.fillAlpha
+            fillColor: newFillColor,
+            fillAlpha: newFillAlpha
           };
         }
       } else if (selectionAction === "eraseBorder") {
@@ -2599,10 +2635,10 @@
       canvas.style.height = "";
 
       setSelectionAction("apply");
-      borderColorEl.value = "#000000";
+      borderColorEl.value = "none";
       textColorEl.value = "";
       cellTextEl.value = "";
-      fillColorEl.value = "";
+      fillColorEl.value = "none";
       fillOpacityEl.value = 35;
 
       selectedCells = {};
@@ -2848,7 +2884,7 @@
       const bwInput = document.querySelector(`input[name="borderWidth"][value="${bwVal}"]`);
       if (bwInput) bwInput.checked = true;
 
-      borderColorEl.value = s.borderColor || "#000000";
+      borderColorEl.value = s.borderColor || "none";
       textColorEl.value   = s.textColor || "";
 
       autoRefresh.checked = !!s.autoRefresh;
@@ -2862,7 +2898,7 @@
       zoomNumber.value  = zoomRange.value;
       applyZoomScale();
 
-      fillColorEl.value   = s.fillColorDefault || "";
+      fillColorEl.value   = s.fillColorDefault || "none";
       fillOpacityEl.value = s.fillOpacity || 35;
 
       selectedCells   = s.selectedCells || {};
@@ -3215,15 +3251,6 @@
     });
 
     /* ==== INIT ==== */
-
-    function initSheets() {
-      const baseScenario = buildScenario();
-      sheets = [
-        { name: "Feuille 1", scenario: baseScenario, imageData: null }
-      ];
-      currentSheetIndex = 0;
-      refreshSheetSelect();
-    }
 
     initSheets();
   </script>
