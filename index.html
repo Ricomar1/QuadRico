@@ -210,7 +210,7 @@
       color: var(--text-sub);
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       gap: 4px;
       white-space: nowrap;
     }
@@ -249,6 +249,13 @@
       background: #f9fafb;
       border-color: #d1d5db;
       color: #111827;
+    }
+
+    .shortcut-hint {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 4px;
+      text-align: center;
     }
 
     /* Toolbar APPLIQUER / SUPPRIMER – STICKY */
@@ -302,6 +309,11 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
 
+    .toolbar-main .undo-redo-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
     :root[data-theme="light"] .toolbar-main .undo-redo-btn {
       border-color: #d1d5db;
       box-shadow: 0 2px 7px rgba(148,163,184,0.7);
@@ -344,6 +356,45 @@
       background: var(--btn-bg-hover);
       transform: translateY(-1px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    /* Feuilles dans le bandeau */
+
+    .sheet-buttons {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+      justify-content: center;
+    }
+
+    .sheet-buttons button {
+      padding: 4px 8px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: 1px solid #2c3345;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .sheet-buttons button:hover {
+      background: var(--btn-bg-hover);
+    }
+
+    .sheet-select-inline {
+      width: 120px;
+      margin-left: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border-panel);
+      background: #090c14;
+      color: var(--text-main);
+      padding: 2px 4px;
+    }
+
+    :root[data-theme="light"] .sheet-select-inline {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #111827;
     }
 
     /* LAYOUT PRINCIPAL */
@@ -581,10 +632,6 @@
 
     /* AIDE / MODAL */
 
-    .hidden {
-      display: none;
-    }
-
     .help-overlay {
       position: fixed;
       inset: 0;
@@ -595,14 +642,24 @@
       z-index: 1000;
     }
 
+    .help-overlay.hidden {
+      display: none !important;
+    }
+
+    .hidden {
+      display: none;
+    }
+
     .help-modal {
       position: relative;
       background: var(--bg-panel);
       border: 1px solid var(--border-panel);
       border-radius: 12px;
       padding: 16px 20px 14px 20px;
-      max-width: 480px;
+      max-width: 520px;
       width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 12px 30px rgba(0,0,0,0.7);
     }
 
@@ -643,6 +700,30 @@
 
     .help-close:hover {
       color: var(--text-main);
+    }
+
+    details {
+      margin-top: 6px;
+    }
+
+    details > summary {
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--accent);
+      list-style: none;
+    }
+
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details > summary::before {
+      content: "▸ ";
+      font-size: 12px;
+    }
+
+    details[open] > summary::before {
+      content: "▾ ";
     }
 
     /* ===================== RESPONSIVE TÉLÉPHONE ===================== */
@@ -687,11 +768,12 @@
       .toolbar-main {
         top: 0;
         border-radius: 10px;
-        justify-content: center;
+        justify-content:center;
       }
       .toolbar-main #undoBtn,
       .toolbar-main #redoBtn,
-      .toolbar-main #undoDeleteBtn {
+      .toolbar-main #undoDeleteBtn,
+      .toolbar-main #autoRefreshBtn {
         order: 1;
       }
       .toolbar-main #drawBtn {
@@ -761,13 +843,19 @@
       <button id="briefingBtn" class="top-icon-btn briefing" aria-label="Mode briefing">
         🎬
       </button>
-      <button id="saveScenarioBtn" class="top-icon-btn save" aria-label="Sauvegarder scénario">
+      <!-- PNG -->
+      <button id="saveScenarioBtn" class="top-icon-btn save" aria-label="Enregistrer l'image PNG">
         💾
       </button>
-      <button id="loadScenarioBtn" class="top-icon-btn load" aria-label="Charger scénario">
+      <!-- JSON load + JSON download -->
+      <button id="loadScenarioBtn" class="top-icon-btn load" aria-label="Charger scénario JSON">
         📂
       </button>
-      <button id="helpBtn" class="top-icon-btn help" aria-label="Aide / guide rapide">
+      <button id="downloadBtn" class="top-icon-btn download" aria-label="Télécharger scénario JSON">
+        ⬇
+      </button>
+      <!-- Aide + impression + reset + contact -->
+      <button id="helpBtn" class="top-icon-btn help" aria-label="Aide détaillée / guide rapide">
         ❓
       </button>
       <button id="printBtn" class="top-icon-btn printA4" aria-label="Imprimer A4">
@@ -775,9 +863,6 @@
       </button>
       <button id="printA3Btn" class="top-icon-btn printA3" aria-label="Imprimer A3">
         🖨 A3
-      </button>
-      <button id="downloadBtn" class="top-icon-btn download" aria-label="Télécharger PNG" disabled>
-        ⬇
       </button>
       <button id="resetBtn" class="top-icon-btn reset" aria-label="Effacer / Reset">
         🗑
@@ -793,20 +878,45 @@
     <div id="iconHint" class="icon-hint"></div>
 
     <div class="source-zoom-row">
+      <!-- SOURCE avec Google Maps + grille -->
       <div class="source-box">
         <strong>Source</strong>
         <label>
           <span>Image :</span>
           <input type="file" id="imageLoader" accept="image/*">
         </label>
-      </div>
-
-      <div class="mid-box">
-        <strong>Paramètres de grille</strong>
+        <label>
+          <span>Adresse Google Maps :</span>
+          <span style="display:flex;gap:4px;align-items:center;">
+            <input type="text" id="mapsAddress" placeholder="Ex : 10 Rue ..., Ville">
+            <button id="mapsOpenBtn" type="button" class="selection-mode-btn" style="padding:4px 8px;font-size:11px;">
+              🔍
+            </button>
+          </span>
+        </label>
         <label>
           <span>Grille sans image</span>
           <input type="checkbox" id="gridOnly">
         </label>
+      </div>
+
+      <!-- Feuilles dans le même bandeau -->
+      <div class="mid-box">
+        <strong>Feuilles</strong>
+        <label>
+          <span>Feuille :</span>
+          <select id="sheetSelect" class="sheet-select-inline"></select>
+        </label>
+        <div class="sheet-buttons">
+          <button id="addSheetBtn" title="Ajouter une feuille">＋</button>
+          <button id="renameSheetBtn" title="Renommer la feuille">✎</button>
+          <button id="duplicateSheet1Btn" title="Copier la feuille affichée">⧉</button>
+          <button id="deleteSheetBtn" title="Supprimer la feuille">🗑</button>
+        </div>
+      </div>
+
+      <div class="mid-box">
+        <strong>Paramètres de grille</strong>
         <label>
           <span>Colonnes :</span>
           <input type="number" id="cols" value="10" min="1">
@@ -843,6 +953,7 @@
             <input type="number" id="zoomNumber" min="50" max="300" value="100">
           </span>
         </label>
+        <div class="shortcut-hint">Raccourcis : Ctrl + molette</div>
       </div>
     </div>
   </div>
@@ -862,7 +973,13 @@
         <button id="drawBtn">
           APPLIQUER
         </button>
+        <button id="autoRefreshBtn" class="undo-redo-btn" title="Rafraîchissement auto">
+          ⟳ AUTO
+        </button>
       </div>
+
+      <!-- checkbox technique cachée pour la logique -->
+      <input type="checkbox" id="autoRefresh" style="display:none;">
 
       <div class="canvas-scroll">
         <canvas id="canvas"></canvas>
@@ -872,14 +989,6 @@
 
     <div class="side-panel">
       <div class="controls">
-        <div class="group group-full">
-          <strong>Rafraîchissement auto :</strong>
-          <label>
-            <span>Appliquer automatiquement les modifications</span>
-            <input type="checkbox" id="autoRefresh">
-          </label>
-        </div>
-
         <div class="group">
           <strong>Choix du type de quadrillage :</strong>
           <label>
@@ -958,10 +1067,6 @@
 
         <div class="group group-full">
           <strong>Sélection de case :</strong>
-          <label>
-            <span>Activer la sélection de cases</span>
-            <input type="checkbox" id="selectionMode">
-          </label>
 
           <div class="selection-modes">
             <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
@@ -981,6 +1086,9 @@
             </button>
             <button id="modeSplit" class="selection-mode-btn" type="button" title="Fractionner les cases">
               <span class="icon">▢</span> Fractionner
+            </button>
+            <button id="modeReset" class="selection-mode-btn" type="button" title="Réinitialiser la case">
+              <span class="icon">⭮</span> Réinitialiser
             </button>
           </div>
 
@@ -1035,69 +1143,190 @@
               <option value="#ffffff">Blanc</option>
             </select>
           </label>
+          <label>
+            <span>Couleur de zone :</span>
+            <select id="fillColor">
+              <option value="">(Aucune)</option>
+              <option value="rgba(255,0,0,0.6)">Rouge</option>
+              <option value="rgba(0,128,0,0.6)">Vert</option>
+              <option value="rgba(0,0,255,0.6)">Bleu</option>
+              <option value="rgba(255,255,0,0.6)">Jaune</option>
+              <option value="rgba(255,165,0,0.6)">Orange</option>
+              <option value="rgba(128,0,128,0.6)">Violet</option>
+              <option value="rgba(255,255,255,0.6)">Blanc</option>
+              <option value="rgba(0,0,0,0.6)">Noir</option>
+            </select>
+          </label>
+          <label>
+            <span>Opacité de zone :</span>
+            <input type="range" id="fillOpacity" min="0" max="100" value="35">
+          </label>
 
           <small style="font-size:11px;color:var(--text-sub); white-space:normal;">
-            Clique sur une case pour appliquer l'action choisie.<br>
+            Clique directement sur une case pour appliquer l'action choisie.<br>
             Si un texte est défini, croix et codes sont désactivés pour cette case.<br>
-            Utilise ↩ / ↪ pour revenir en arrière ou en avant sur tes modifs.
+            Utilise ↩ / ↪ ou <strong>Ctrl + Z</strong> pour revenir en arrière.<br>
+            Utilise <strong>Ctrl + C / Ctrl + V</strong> pour copier / coller le style de la dernière case cliquée.<br>
+            Touche <strong>Entrée</strong> = bouton <strong>APPLIQUER</strong>.<br>
+            Touche <strong>Suppr (Delete)</strong> = réinitialiser la dernière case cliquée.
           </small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Overlay AIDE (démarre ouvert via JS) -->
+  <!-- Overlay AIDE SIMPLE au démarrage -->
+  <div id="welcomeOverlay" class="help-overlay">
+    <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+      <button id="closeWelcomeBtn" class="help-close" aria-label="Fermer l'aide rapide">✕</button>
+      <h2 id="welcomeTitle">QuadRico – Démarrage rapide</h2>
+      <p><strong>1.</strong> Charge une image ou coche <strong>Grille sans image</strong>.</p>
+      <p><strong>2.</strong> Règle le nombre de <strong>colonnes / lignes</strong>.</p>
+      <p><strong>3.</strong> Choisis ton type de quadrillage puis clique sur <strong>APPLIQUER</strong> (ou touche <strong>Entrée</strong>).</p>
+      <p><strong>4.</strong> Clique sur les cases pour :</p>
+      <ul>
+        <li>ajouter bordure / texte / zone colorée,</li>
+        <li>effacer bordure ou texte,</li>
+        <li>fusionner / fractionner / réinitialiser une case.</li>
+      </ul>
+      <p><strong>Raccourcis principaux :</strong>  
+        Entrée (APPLIQUER), Ctrl + Z (annuler), Ctrl + C / Ctrl + V (copier / coller le style),  
+        Ctrl + molette (zoom), Suppr (Delete) = réinitialiser la dernière case cliquée.
+      </p>
+      <p>Pour plus de détails, clique sur <strong>❓</strong> ou active <strong>⟳ AUTO</strong> à droite d’APPLIQUER pour le rafraîchissement automatique.</p>
+    </div>
+  </div>
+
+  <!-- Overlay AIDE DÉTAILLÉE (bouton ❓) -->
   <div id="helpOverlay" class="help-overlay hidden">
     <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
       <button id="closeHelpBtn" class="help-close" aria-label="Fermer l'aide">✕</button>
-      <h2 id="helpTitle">Guide rapide QuadRico</h2>
+      <h2 id="helpTitle">Guide complet QuadRico</h2>
 
-      <h3>1. Charger une image ou une grille seule</h3>
-      <ul>
-        <li><strong>Source &gt; Image</strong> : importe une photo (satellite, plan, etc.).</li>
-        <li><strong>Grille sans image</strong> : crée un quadrillage seul (fond noir) sans image de base.</li>
-      </ul>
+      <details open>
+        <summary>1. Source & affichage</summary>
+        <ul>
+          <li><strong>Image</strong> : importe une photo (satellite, plan, croquis, etc.).</li>
+          <li><strong>Adresse Google Maps</strong> : sais une adresse ou un lieu (10 Rue ..., ville) puis clique sur 🔍 pour ouvrir Google Maps dans un nouvel onglet.</li>
+          <li><strong>Grille sans image</strong> : quadrillage seul (fond noir / blanc selon le thème).</li>
+        </ul>
+      </details>
 
-      <h3>2. Créer le quadrillage</h3>
-      <ul>
-        <li>Régle <strong>Colonnes / Lignes</strong> selon tes besoins (ex : 10×14).</li>
-        <li>Choisis le <strong>type de quadrillage</strong> : Noir, Rouge ou FSI (4 couleurs).</li>
-        <li>Choisis le <strong>type de code</strong> : aucun, noir, rouge ou FSI (A1, B3...).</li>
-        <li>Clique sur <strong>APPLIQUER</strong> pour afficher / mettre à jour la grille.</li>
-      </ul>
+      <details>
+        <summary>2. Quadrillage & légende</summary>
+        <ul>
+          <li><strong>Colonnes / Lignes</strong> : taille de la grille (A1, B3, …).</li>
+          <li><strong>Quadrillage</strong> :
+            <ul>
+              <li><em>Aucun</em> : pas de quadrillage.</li>
+              <li><em>Noir / Rouge</em> : quadrillage uni.</li>
+              <li><em>FSI</em> : quadrillage en 4 couleurs (quadrants).</li>
+            </ul>
+          </li>
+          <li><strong>Légende</strong> :
+            <ul>
+              <li><em>Pas de légende</em> : aucune lettre / chiffre autour.</li>
+              <li><em>Partielle</em> : lettres en haut, chiffres à gauche.</li>
+              <li><em>Totale</em> : lettres en haut / bas, chiffres à gauche / droite.</li>
+            </ul>
+          </li>
+          <li><strong>Rafraîchissement auto (⟳ AUTO)</strong> : bouton à droite de <strong>APPLIQUER</strong>.  
+            Quand il est activé, la carte se met à jour automatiquement dès que tu modifies un paramètre (sinon, tu dois cliquer sur <strong>APPLIQUER</strong>).</li>
+          <li>Les colonnes suivent la logique <strong>A, B, …, Z, AA, AB, …</strong>.</li>
+        </ul>
+      </details>
 
-      <h3>3. Travail par case</h3>
-      <ul>
-        <li>Active <strong>Sélection de case</strong> pour modifier une case précise.</li>
-        <li>Choisis l'action :
-          <ul>
-            <li><em>Appliquer</em> : bordure, couleur, texte personnalisé.</li>
-            <li><em>Effacer bordure</em> : supprime le trait sur cette case.</li>
-            <li><em>Effacer texte/croix</em> : supprime codes, croix, texte.</li>
-            <li><em>Fusionner</em> : regroupe plusieurs cases en une seule zone.</li>
-            <li><em>Fractionner</em> : retire une case d'une zone fusionnée.</li>
-          </ul>
-        </li>
-      </ul>
+      <details>
+        <summary>3. Codes, croix & zones colorées</summary>
+        <ul>
+          <li><strong>Type de code</strong> :
+            <ul>
+              <li><em>Aucun</em> : cases vides.</li>
+              <li><em>Noir / Rouge</em> : code simple A1, B3… d'une seule couleur.</li>
+              <li><em>FSI</em> : couleur du code selon le quadrant.</li>
+            </ul>
+          </li>
+          <li><strong>Croix</strong> : coche une seule couleur de croix (noir, rouge ou FSI).</li>
+          <li><strong>Zones colorées</strong> :
+            <ul>
+              <li>Choisis une <strong>couleur de zone</strong> et une <strong>opacité</strong>.</li>
+              <li>En mode <em>Appliquer</em>, clique dans les cases pour teinter la zone (secteurs, zones d'appui, etc.).</li>
+            </ul>
+          </li>
+        </ul>
+      </details>
 
-      <h3>4. Sauvegarde et partage</h3>
-      <ul>
-        <li><strong>💾 Sauvegarder scénario</strong> : télécharge un fichier <code>.json</code> contenant toute ta configuration (grille, fusions, textes...).</li>
-        <li><strong>📂 Charger scénario</strong> : recharge un fichier <code>.json</code> QuadRico pour retrouver un dispositif déjà préparé.</li>
-      </ul>
+      <details>
+        <summary>4. Travail par case</summary>
+        <ul>
+          <li>Les actions se font <strong>directement en cliquant sur la case</strong> :</li>
+          <li><strong>Appliquer</strong> :
+            <ul>
+              <li>Dessine une bordure (couleur / épaisseur).</li>
+              <li>Ajoute un texte personnalisé.</li>
+              <li>Applique une zone colorée.</li>
+            </ul>
+          </li>
+          <li><strong>Effacer bordure</strong> : supprime le trait de la case (ou du bloc fusionné).</li>
+          <li><strong>Effacer texte/croix</strong> : enlève texte + codes + croix pour cette case / zone.</li>
+          <li><strong>Fusionner</strong> : regroupe plusieurs cases en une seule zone (bordure + texte unique).</li>
+          <li><strong>Fractionner</strong> : retire une case d'une zone fusionnée.</li>
+          <li><strong>Réinitialiser</strong> : remet une case comme à l'origine.</li>
+          <li><strong>Copier / coller un style</strong> :
+            <ul>
+              <li>Clique sur une case, puis <strong>Ctrl + C</strong> pour copier son style (bordure, texte, couleur, zone, etc.).</li>
+              <li>Clique sur la case cible, puis <strong>Ctrl + V</strong> pour coller ce style.</li>
+            </ul>
+          </li>
+          <li><strong>Suppr (Delete)</strong> : réinitialise la dernière case cliquée (équivalent de l'action “Réinitialiser la case”).</li>
+        </ul>
+      </details>
 
-      <h3>5. Export & briefing</h3>
-      <ul>
-        <li><strong>🖨 A4 / A3</strong> : impression/PDF en portrait ou paysage (selon l'icône orientation).</li>
-        <li><strong>⬇</strong> : télécharge la carte en image PNG.</li>
-        <li><strong>🎬</strong> : mode briefing pour afficher la carte en grand (projection salle).</li>
-      </ul>
+      <details>
+        <summary>5. Onglets / feuilles</summary>
+        <ul>
+          <li><strong>Feuille</strong> : menu déroulant dans le bandeau (à côté de SOURCE).</li>
+          <li><strong>＋</strong> : ajoute une nouvelle feuille <em>sans copier l'image</em> (tu peux charger une autre carte).</li>
+          <li><strong>✎</strong> : renomme la feuille.</li>
+          <li><strong>⧉</strong> : crée une feuille copiée depuis la <strong>feuille affichée actuellement</strong> (scénario + image).</li>
+          <li><strong>🗑</strong> : supprime la feuille (sauf s'il n'en reste qu'une).</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>6. Export & briefing (icônes du haut)</summary>
+        <ul>
+          <li><strong>☯</strong> : thème sombre / clair.</li>
+          <li><strong>🖼️↕ / 🖼️↔</strong> : portrait / paysage (affichage et impression).</li>
+          <li><strong>⛶</strong> : plein écran.</li>
+          <li><strong>🎬</strong> : mode briefing (la carte seule, sans les options).</li>
+          <li><strong>💾</strong> : enregistre l'image en <strong>PNG</strong>.</li>
+          <li><strong>📂</strong> : charge un scénario <strong>.json</strong>.</li>
+          <li><strong>⬇</strong> : télécharge le scénario <strong>JSON</strong> (paramètres + grille).</li>
+          <li><strong>🖨 A4 / 🖨 A3</strong> : impression PDF A4 / A3.</li>
+          <li><strong>🗑</strong> : réinitialise tous les réglages après confirmation.</li>
+          <li><strong>✉</strong> : contact mail vers le concepteur.</li>
+        </ul>
+        <p><strong>Astuce :</strong> sur la carte, tu peux utiliser <strong>Ctrl + molette</strong> pour zoomer.</p>
+      </details>
+
+      <details>
+        <summary>7. Raccourcis clavier</summary>
+        <ul>
+          <li><strong>Entrée</strong> : équivalent du bouton <strong>APPLIQUER</strong>.</li>
+          <li><strong>Ctrl + Z</strong> : annuler la dernière modification.</li>
+          <li><strong>Ctrl + C</strong> : copier le style de la dernière case cliquée.</li>
+          <li><strong>Ctrl + V</strong> : coller le style copié sur la dernière case cliquée.</li>
+          <li><strong>Ctrl + molette</strong> : zoomer / dézoomer sur la carte.</li>
+          <li><strong>Suppr (Delete)</strong> : réinitialiser la dernière case cliquée.</li>
+        </ul>
+      </details>
     </div>
   </div>
 
   <footer>
     QuadRico – Outil libre d'utilisation, non contractuel.  
-    Générateur de quadrillage mis à disposition à titre gratuit pour un usage pédagogique.
+    Générateur de quadrillage mis à disposition à titre gratuit pour un usage pédagogique et opérationnel.
   </footer>
 
   <!-- Input caché pour charger un scénario JSON -->
@@ -1127,6 +1356,8 @@
     const crossFSI      = document.getElementById('crossFSI');
 
     const gridOnly      = document.getElementById('gridOnly');
+    const autoRefresh   = document.getElementById('autoRefresh');
+    const autoRefreshBtn= document.getElementById('autoRefreshBtn');
     const imageOpacity  = document.getElementById('imageOpacity');
     const gridOpacity   = document.getElementById('gridOpacity');
     const codeOpacity   = document.getElementById('codeOpacity');
@@ -1135,10 +1366,11 @@
     const zoomValue     = document.getElementById('zoomValue');
     const zoomNumber    = document.getElementById('zoomNumber');
 
-    const selectionMode = document.getElementById('selectionMode');
     const borderColorEl = document.getElementById('borderColor');
     const textColorEl   = document.getElementById('textColor');
     const cellTextEl    = document.getElementById('cellText');
+    const fillColorEl   = document.getElementById('fillColor');
+    const fillOpacityEl = document.getElementById('fillOpacity');
 
     const themeToggle   = document.getElementById('themeToggle');
     const orientationToggle = document.getElementById('orientationToggle');
@@ -1153,7 +1385,7 @@
     const modeEraseCodeBtn   = document.getElementById('modeEraseCode');
     const modeMergeBtn       = document.getElementById('modeMerge');
     const modeSplitBtn       = document.getElementById('modeSplit');
-    const autoRefresh        = document.getElementById('autoRefresh');
+    const modeResetBtn       = document.getElementById('modeReset');
 
     const saveScenarioBtn    = document.getElementById('saveScenarioBtn');
     const loadScenarioBtn    = document.getElementById('loadScenarioBtn');
@@ -1162,6 +1394,18 @@
     const helpBtn            = document.getElementById('helpBtn');
     const helpOverlay        = document.getElementById('helpOverlay');
     const closeHelpBtn       = document.getElementById('closeHelpBtn');
+
+    const welcomeOverlay     = document.getElementById('welcomeOverlay');
+    const closeWelcomeBtn    = document.getElementById('closeWelcomeBtn');
+
+    const sheetSelect        = document.getElementById('sheetSelect');
+    const addSheetBtn        = document.getElementById('addSheetBtn');
+    const renameSheetBtn     = document.getElementById('renameSheetBtn');
+    const duplicateSheet1Btn = document.getElementById('duplicateSheet1Btn');
+    const deleteSheetBtn     = document.getElementById('deleteSheetBtn');
+
+    const mapsAddress        = document.getElementById('mapsAddress');
+    const mapsOpenBtn        = document.getElementById('mapsOpenBtn');
 
     let selectionAction = "apply";
 
@@ -1188,8 +1432,26 @@
     let baseCanvasWidth = 0;
     let baseCanvasHeight = 0;
 
+    // Feuilles : scénario + imageData
+    let sheets = [];
+    let currentSheetIndex = 0;
+
+    // Pour les raccourcis Ctrl+C / Ctrl+V / Delete
+    let lastClickedCell = null;
+    let copiedCellStyle = null;
+
     function setMsg(text) {
       msg.textContent = text || "";
+    }
+
+    function indexToLetters(index) {
+      index = Math.floor(index);
+      let s = "";
+      while (index >= 0) {
+        s = String.fromCharCode(65 + (index % 26)) + s;
+        index = Math.floor(index / 26) - 1;
+      }
+      return s;
     }
 
     function handleCrossChange(changed) {
@@ -1268,16 +1530,17 @@
     addIconHint(themeToggle,      "Basculer entre mode sombre et mode clair");
     addIconHint(orientationToggle,"Basculer entre portrait et paysage (affichage & impression)");
     addIconHint(fullscreenToggle, "Basculer en mode plein écran");
-    addIconHint(briefingBtn,      "Mode briefing : la carte est mise en avant, les réglages sont masqués.");
-    addIconHint(saveScenarioBtn,  "Sauvegarder le scénario (fichier JSON)");
+    addIconHint(briefingBtn,      "Mode briefing : la carte est mise en avant, les options sont masquées.");
+    addIconHint(saveScenarioBtn,  "Enregistrer l'image quadrillée en PNG");
     addIconHint(loadScenarioBtn,  "Charger un scénario QuadRico (.json)");
-    addIconHint(helpBtn,          "Afficher le guide rapide QuadRico");
+    addIconHint(downloadBtn,      "Télécharger le scénario (JSON)");
+    addIconHint(helpBtn,          "Afficher le guide détaillé QuadRico");
     addIconHint(printBtn,         "Imprimer / exporter en PDF A4");
     addIconHint(printA3Btn,       "Imprimer / exporter en PDF A3");
-    addIconHint(downloadBtn,      "Télécharger l'image quadrillée en PNG");
     addIconHint(resetBtn,         "Réinitialiser tous les réglages et effacer la grille");
     addIconHint(contactBtn,       "Envoyer un mail au concepteur de QuadRico");
     addIconHint(optionsToggle,    "Afficher / masquer le bloc options (mode mobile)");
+    addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre.");
 
     contactBtn.addEventListener('click', () => {
       contactInfo.textContent =
@@ -1326,6 +1589,7 @@
 
     initOptionsCollapsedOnLoad();
 
+    // Chargement d'image + stockage dans la feuille
     imageLoader.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (!file) {
@@ -1335,13 +1599,17 @@
 
       const reader = new FileReader();
       reader.onload = function (ev) {
+        const dataUrl = ev.target.result;
         const image = new Image();
         image.onload = function () {
           img = image;
           gridOnly.checked = false;
           setMsg("Image chargée. Clique sur \"APPLIQUER\".");
+          if (sheets[currentSheetIndex]) {
+            sheets[currentSheetIndex].imageData = dataUrl;
+          }
           drawBase();
-          downloadBtn.disabled = true;
+          downloadBtn.disabled = false;
           if (autoRefresh.checked) {
             drawGrid();
           }
@@ -1349,7 +1617,7 @@
         image.onerror = function () {
           setMsg("Erreur lors du chargement de l'image.");
         };
-        image.src = ev.target.result;
+        image.src = dataUrl;
       };
       reader.readAsDataURL(file);
     });
@@ -1482,6 +1750,55 @@
       return null;
     }
 
+    function drawZoneFills() {
+      if (!lastGridGeom) return;
+      const { cols, rows, cellW, cellH } = lastGridGeom;
+
+      ctx.save();
+
+      for (const key in selectedCells) {
+        const sel = selectedCells[key];
+        if (!sel.fillColor) continue;
+
+        const [cStr, rStr] = key.split(",");
+        const c = parseInt(cStr, 10);
+        const r = parseInt(rStr, 10);
+        if (isNaN(c) || isNaN(r)) continue;
+        if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+
+        const xCell = MARGIN_LEFT + c * cellW;
+        const yCell = MARGIN_TOP  + r * cellH;
+        const alpha = typeof sel.fillAlpha === "number" ? sel.fillAlpha : 0.35;
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = sel.fillColor;
+        ctx.fillRect(xCell, yCell, cellW, cellH);
+      }
+
+      for (const region of mergedRegions) {
+        if (!region.fillColor || !region.cells || !region.cells.length) continue;
+        const alpha = typeof region.fillAlpha === "number" ? region.fillAlpha : 0.35;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = region.fillColor;
+
+        for (const cell of region.cells) {
+          const c = cell.c;
+          const r = cell.r;
+          if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+          const xCell = MARGIN_LEFT + c * cellW;
+          const yCell = MARGIN_TOP  + r * cellH;
+          ctx.fillRect(xCell, yCell, cellW, cellH);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function getLegendMode() {
+      const r = document.querySelector('input[name="legendMode"]:checked');
+      return r ? r.value : "full";
+    }
+
     function drawGrid() {
       const cols = parseInt(document.getElementById('cols').value, 10);
       const rows = parseInt(document.getElementById('rows').value, 10);
@@ -1504,6 +1821,8 @@
       }
 
       drawBase();
+      drawZoneFills();
+
       if (!lastGridGeom) return;
 
       const { cellW, cellH, imgW, imgH, cols: C, rows: R } = lastGridGeom;
@@ -1628,7 +1947,7 @@
 
         if (legendMode === "partial" || legendMode === "full") {
           for (let c = 0; c < C; c++) {
-            const label = String.fromCharCode(65 + c);
+            const label = indexToLetters(c);
             ctx.fillText(label, MARGIN_LEFT + (c + 0.5) * cellW, MARGIN_TOP / 2);
           }
 
@@ -1642,7 +1961,7 @@
           ctx.textAlign = "center";
           const bottomY = MARGIN_TOP + imgH + MARGIN_TOP / 2;
           for (let c = 0; c < C; c++) {
-            const label = String.fromCharCode(65 + c);
+            const label = indexToLetters(c);
             ctx.fillText(label, MARGIN_LEFT + (c + 0.5) * cellW, bottomY);
           }
 
@@ -1711,7 +2030,7 @@
             const regionHere = findRegionByCell(c, r);
             if (regionHere && regionHere.text && regionHere.text.length > 0) continue;
 
-            const label = String.fromCharCode(65 + c) + (r + 1);
+            const label = indexToLetters(c) + (r + 1);
             let textColor = "black";
 
             if (labelMode === "color") {
@@ -1774,7 +2093,7 @@
         const a = typeof alpha === "number" ? alpha : 1.0;
         ctx.globalAlpha = a;
 
-        if (borderWidth && borderColor && !sel.noGrid) {
+        if (borderWidth && borderColor) {
           ctx.lineWidth = borderWidth;
           ctx.strokeStyle = borderColor;
           ctx.strokeRect(xCell, yCell, cellW, cellH);
@@ -1930,19 +2249,25 @@
       ctx.globalAlpha = 1;
       downloadBtn.disabled = false;
       setMsg("Quadrillage appliqué. Tu peux télécharger ou imprimer l'image.");
+
+      if (sheets.length) {
+        sheets[currentSheetIndex].scenario = buildScenario();
+        refreshSheetSelect();
+      }
     }
 
     drawBtn.addEventListener('click', drawGrid);
 
     function setSelectionAction(action) {
       selectionAction = action;
-      [modeApplyBtn, modeEraseBorderBtn, modeEraseCodeBtn, modeMergeBtn, modeSplitBtn]
+      [modeApplyBtn, modeEraseBorderBtn, modeEraseCodeBtn, modeMergeBtn, modeSplitBtn, modeResetBtn]
         .forEach(btn => btn.classList.remove('active'));
       if (action === "apply") modeApplyBtn.classList.add('active');
       if (action === "eraseBorder") modeEraseBorderBtn.classList.add('active');
       if (action === "eraseCode") modeEraseCodeBtn.classList.add('active');
       if (action === "merge") modeMergeBtn.classList.add('active');
       if (action === "split") modeSplitBtn.classList.add('active');
+      if (action === "reset") modeResetBtn.classList.add('active');
     }
 
     modeApplyBtn.addEventListener('click', () => setSelectionAction("apply"));
@@ -1950,6 +2275,7 @@
     modeEraseCodeBtn.addEventListener('click', () => setSelectionAction("eraseCode"));
     modeMergeBtn.addEventListener('click', () => setSelectionAction("merge"));
     modeSplitBtn.addEventListener('click', () => setSelectionAction("split"));
+    modeResetBtn.addEventListener('click', () => setSelectionAction("reset"));
 
     function pushHistory() {
       const snapshot = structuredClone({
@@ -1971,7 +2297,7 @@
       drawGrid();
     }
 
-    undoBtn.addEventListener('click', () => {
+    function undoAction() {
       if (historyIndex > 0) {
         historyIndex--;
         restoreFromHistory();
@@ -1979,20 +2305,40 @@
       } else {
         setMsg("Aucune action à annuler.");
       }
-    });
+    }
 
-    redoBtn.addEventListener('click', () => {
+    function redoAction() {
       if (historyIndex < history.length - 1) {
         historyIndex++;
         restoreFromHistory();
-        setMsg("Aucune action à rétablir.");
+        setMsg("Action rétablie.");
       } else {
         setMsg("Aucune action à rétablir.");
       }
-    });
+    }
+
+    undoBtn.addEventListener('click', undoAction);
+    redoBtn.addEventListener('click', redoAction);
+
+    function resetCell(c, r) {
+      const key = `${c},${r}`;
+      const regionHere = findRegionByCell(c, r);
+      if (regionHere) {
+        regionHere.cells = regionHere.cells.filter(cell => !(cell.c === c && cell.r === r));
+        if (regionHere.cells.length === 0) {
+          const regionIndex = mergedRegions.findIndex(rg => rg.id === regionHere.id);
+          if (regionIndex >= 0) {
+            mergedRegions.splice(regionIndex, 1);
+          }
+          if (currentRegionId === regionHere.id) {
+            currentRegionId = null;
+          }
+        }
+      }
+      delete selectedCells[key];
+    }
 
     canvas.addEventListener('click', (e) => {
-      if (!selectionMode.checked) return;
       if (!lastGridGeom) return;
 
       const rect = canvas.getBoundingClientRect();
@@ -2016,6 +2362,8 @@
       const key = `${c},${r}`;
       let regionHere = findRegionByCell(c, r);
 
+      lastClickedCell = { c, r };
+
       if (selectionAction === "merge" && regionHere) {
         currentRegionId = regionHere.id;
       }
@@ -2029,21 +2377,37 @@
         const txtColor = textColorEl.value || "";
         const alpha = 1.0;
 
+        const fillColor = fillColorEl.value || "";
+        const fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
+
         if (regionHere) {
           regionHere.borderColor = borderColor;
           regionHere.borderWidth = borderWidth;
           regionHere.text       = text;
           regionHere.textColor  = txtColor;
           regionHere.alpha      = alpha;
+          regionHere.fillColor  = fillColor || null;
+          regionHere.fillAlpha  = fillColor ? fillAlpha : null;
+
+          for (const cell of regionHere.cells) {
+            const k = `${cell.c},${cell.r}`;
+            const existing = selectedCells[k] || {};
+            existing.noGrid = false;
+            selectedCells[k] = existing;
+          }
         } else {
+          const existing = selectedCells[key] || {};
           selectedCells[key] = {
+            ...existing,
             borderColor,
             borderWidth,
             text,
             textColor: txtColor,
             noCode: text.length > 0,
-            noGrid: selectedCells[key]?.noGrid || false,
-            alpha
+            noGrid: false,
+            alpha,
+            fillColor: fillColor || existing.fillColor || null,
+            fillAlpha: fillColor ? fillAlpha : existing.fillAlpha
           };
         }
       } else if (selectionAction === "eraseBorder") {
@@ -2087,12 +2451,12 @@
           if (currentRegionId) {
             region = mergedRegions.find(rg => rg.id === currentRegionId);
             if (!region) {
-              region = { id: nextRegionId++, cells: [], borderColor: null, borderWidth: null, text: "", textColor: "", alpha: 1 };
+              region = { id: nextRegionId++, cells: [], borderColor: null, borderWidth: null, text: "", textColor: "", alpha: 1, fillColor: null, fillAlpha: null };
               mergedRegions.push(region);
               currentRegionId = region.id;
             }
           } else {
-            region = { id: nextRegionId++, cells: [], borderColor: null, borderWidth: null, text: "", textColor: "", alpha: 1 };
+            region = { id: nextRegionId++, cells: [], borderColor: null, borderWidth: null, text: "", textColor: "", alpha: 1, fillColor: null, fillAlpha: null };
             mergedRegions.push(region);
             currentRegionId = region.id;
           }
@@ -2119,6 +2483,8 @@
         } else {
           setMsg("Cette case n'est pas fusionnée, rien à fractionner ici.");
         }
+      } else if (selectionAction === "reset") {
+        resetCell(c, r);
       }
 
       drawGrid();
@@ -2135,10 +2501,10 @@
       nextRegionId = 1;
       pushHistory();
       drawGrid();
-      setMsg("Toutes les modifications (bordures, textes, fusions) ont été supprimées.");
+      setMsg("Toutes les modifications (bordures, textes, fusions, zones) ont été supprimées.");
     });
 
-    downloadBtn.addEventListener('click', function () {
+    function downloadPNG() {
       if (!canvas.width || !canvas.height) {
         setMsg("Rien à télécharger : applique un quadrillage d'abord.");
         return;
@@ -2147,7 +2513,9 @@
       link.href = canvas.toDataURL("image/png");
       link.download = "image_quadrillage.png";
       link.click();
-    });
+    }
+
+    saveScenarioBtn.addEventListener('click', downloadPNG);
 
     function printWithSize(pageSize) {
       if (!canvas.width || !canvas.height) {
@@ -2199,6 +2567,9 @@
     printA3Btn.addEventListener('click', () => printWithSize("A3"));
 
     resetBtn.addEventListener('click', function () {
+      const ok = confirm("Tu veux vraiment tout effacer et réinitialiser la grille ?");
+      if (!ok) return;
+
       document.getElementById('cols').value = 10;
       document.getElementById('rows').value = 14;
 
@@ -2212,6 +2583,9 @@
       crossFSI.checked    = false;
 
       gridOnly.checked = false;
+      autoRefresh.checked = false;
+      updateAutoRefreshButton();
+
       imageOpacity.value = 100;
       gridOpacity.value = 100;
       codeOpacity.value = 100;
@@ -2224,11 +2598,12 @@
       canvas.style.width  = "";
       canvas.style.height = "";
 
-      selectionMode.checked = false;
       setSelectionAction("apply");
       borderColorEl.value = "#000000";
       textColorEl.value = "";
       cellTextEl.value = "";
+      fillColorEl.value = "";
+      fillOpacityEl.value = 35;
 
       selectedCells = {};
       mergedRegions = [];
@@ -2241,7 +2616,7 @@
       img = null;
       lastGridGeom = null;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      downloadBtn.disabled = true;
+      downloadBtn.disabled = false;
 
       orientationMode = "portrait";
       updateOrientationButton();
@@ -2249,7 +2624,14 @@
       briefingMode = false;
       document.body.classList.remove('briefing-mode');
 
-      autoRefresh.checked = false;
+      lastClickedCell = null;
+      copiedCellStyle = null;
+
+      if (sheets.length) {
+        sheets[currentSheetIndex].scenario = buildScenario();
+        sheets[currentSheetIndex].imageData = null;
+        refreshSheetSelect();
+      }
 
       setMsg("Réinitialisé. Charge une nouvelle image ou active \"Grille sans image\" pour recommencer.");
       initOptionsCollapsedOnLoad();
@@ -2269,6 +2651,24 @@
       applyZoomScale();
     });
 
+    canvas.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        let val = parseInt(zoomRange.value, 10);
+        if (isNaN(val)) val = 100;
+        if (e.deltaY < 0) {
+          val += 10;
+        } else {
+          val -= 10;
+        }
+        if (val < 50) val = 50;
+        if (val > 300) val = 300;
+        zoomRange.value = val;
+        zoomNumber.value = val;
+        applyZoomScale();
+      }
+    }, { passive: false });
+
     function autoRedrawIfEnabled() {
       if (!autoRefresh.checked) return;
       if (!img && !gridOnly.checked) {
@@ -2278,7 +2678,30 @@
       drawGrid();
     }
 
+    function updateAutoRefreshButton() {
+      if (autoRefresh.checked) {
+        autoRefreshBtn.classList.add('active');
+        autoRefreshBtn.title = "Rafraîchissement auto activé";
+      } else {
+        autoRefreshBtn.classList.remove('active');
+        autoRefreshBtn.title = "Rafraîchissement auto désactivé";
+      }
+    }
+
+    autoRefreshBtn.addEventListener('click', () => {
+      autoRefresh.checked = !autoRefresh.checked;
+      updateAutoRefreshButton();
+      if (autoRefresh.checked) {
+        if (img || gridOnly.checked) {
+          drawGrid();
+        } else {
+          setMsg("Active \"Grille sans image\" ou charge une image.");
+        }
+      }
+    });
+
     autoRefresh.addEventListener('change', () => {
+      updateAutoRefreshButton();
       if (autoRefresh.checked) {
         if (img || gridOnly.checked) {
           drawGrid();
@@ -2308,18 +2731,26 @@
     gridOpacity.addEventListener('input', autoRedrawIfEnabled);
     codeOpacity.addEventListener('input', autoRedrawIfEnabled);
     dashedLines.addEventListener('change', autoRedrawIfEnabled);
+    fillColorEl.addEventListener('change', autoRedrawIfEnabled);
+    fillOpacityEl.addEventListener('input', autoRedrawIfEnabled);
 
     /* ==== AIDE / MODAL ==== */
-
-    function closeHelp() {
-      helpOverlay.classList.add('hidden');
-    }
 
     function openHelp() {
       helpOverlay.classList.remove('hidden');
     }
+    function closeHelp() {
+      helpOverlay.classList.add('hidden');
+    }
+    function openWelcome() {
+      welcomeOverlay.classList.remove('hidden');
+    }
+    function closeWelcome() {
+      welcomeOverlay.classList.add('hidden');
+    }
 
     helpBtn.addEventListener('click', () => {
+      closeWelcome();
       openHelp();
     });
 
@@ -2334,9 +2765,467 @@
       }
     });
 
-    // Ouvrir automatiquement l'aide au démarrage
-    openHelp();
+    closeWelcomeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeWelcome();
+    });
 
+    welcomeOverlay.addEventListener('click', (e) => {
+      if (e.target === welcomeOverlay) {
+        closeWelcome();
+      }
+    });
+
+    window.addEventListener('load', () => {
+      openWelcome();
+      updateAutoRefreshButton();
+    });
+
+    /* ==== SAUVEGARDE / CHARGEMENT SCÉNARIO ==== */
+
+    function buildScenario() {
+      const colsVal = document.getElementById('cols').value;
+      const rowsVal = document.getElementById('rows').value;
+      const borderWidthRadio = document.querySelector('input[name="borderWidth"]:checked');
+
+      return {
+        version: "1.3",
+        cols: colsVal,
+        rows: rowsVal,
+        gridType: getGridType(),
+        legendMode: getLegendMode(),
+        labelMode: getLabelMode(),
+        dashedLines: dashedLines.checked,
+        crossBlack: crossBlack.checked,
+        crossRed: crossRed.checked,
+        crossFSI: crossFSI.checked,
+        gridOnly: gridOnly.checked,
+        imageOpacity: imageOpacity.value,
+        gridOpacity: gridOpacity.value,
+        codeOpacity: codeOpacity.value,
+        borderWidth: borderWidthRadio ? borderWidthRadio.value : "normal",
+        borderColor: borderColorEl.value,
+        textColor: textColorEl.value,
+        autoRefresh: autoRefresh.checked,
+        orientationMode,
+        printOrientation,
+        zoom: zoomRange.value,
+        fillColorDefault: fillColorEl.value,
+        fillOpacity: fillOpacityEl.value,
+        selectedCells,
+        mergedRegions,
+        currentRegionId
+      };
+    }
+
+    function applyScenario(s, fromSheetSwitch = false) {
+      if (!s) return;
+
+      document.getElementById('cols').value = s.cols || 10;
+      document.getElementById('rows').value = s.rows || 14;
+
+      const gtInput = document.querySelector(`input[name="gridType"][value="${s.gridType || 'fsi'}"]`);
+      if (gtInput) gtInput.checked = true;
+
+      const lgInput = document.querySelector(`input[name="legendMode"][value="${s.legendMode || 'full'}"]`);
+      if (lgInput) lgInput.checked = true;
+
+      const lbInput = document.querySelector(`input[name="labelMode"][value="${s.labelMode || 'none'}"]`);
+      if (lbInput) lbInput.checked = true;
+
+      dashedLines.checked = !!s.dashedLines;
+      crossBlack.checked  = !!s.crossBlack;
+      crossRed.checked    = !!s.crossRed;
+      crossFSI.checked    = !!s.crossFSI;
+
+      gridOnly.checked    = !!s.gridOnly;
+
+      imageOpacity.value  = s.imageOpacity ?? 100;
+      gridOpacity.value   = s.gridOpacity ?? 100;
+      codeOpacity.value   = s.codeOpacity ?? 100;
+
+      const bwVal = s.borderWidth || "normal";
+      const bwInput = document.querySelector(`input[name="borderWidth"][value="${bwVal}"]`);
+      if (bwInput) bwInput.checked = true;
+
+      borderColorEl.value = s.borderColor || "#000000";
+      textColorEl.value   = s.textColor || "";
+
+      autoRefresh.checked = !!s.autoRefresh;
+      updateAutoRefreshButton();
+
+      orientationMode = s.orientationMode || "portrait";
+      printOrientation = s.printOrientation || orientationMode;
+      updateOrientationButton();
+
+      zoomRange.value   = s.zoom || 100;
+      zoomNumber.value  = zoomRange.value;
+      applyZoomScale();
+
+      fillColorEl.value   = s.fillColorDefault || "";
+      fillOpacityEl.value = s.fillOpacity || 35;
+
+      selectedCells   = s.selectedCells || {};
+      mergedRegions   = s.mergedRegions || [];
+      currentRegionId = (typeof s.currentRegionId !== "undefined") ? s.currentRegionId : null;
+
+      history = [];
+      historyIndex = -1;
+
+      if (fromSheetSwitch && sheets[currentSheetIndex]) {
+        const dataUrl = sheets[currentSheetIndex].imageData || null;
+        if (dataUrl) {
+          const image = new Image();
+          image.onload = function() {
+            img = image;
+            drawGrid();
+            pushHistory();
+            setMsg(`Feuille "${sheets[currentSheetIndex].name}" chargée (image + scénario).`);
+          };
+          image.onerror = function() {
+            img = null;
+            drawBase();
+            pushHistory();
+            setMsg("Erreur de chargement d'image pour cette feuille.");
+          };
+          image.src = dataUrl;
+        } else {
+          img = null;
+          if (gridOnly.checked) {
+            drawGrid();
+            pushHistory();
+            setMsg(`Feuille "${sheets[currentSheetIndex].name}" sans image (grille seule).`);
+          } else {
+            drawBase();
+            pushHistory();
+            setMsg(`Feuille "${sheets[currentSheetIndex].name}" sans image : charge une image ou active "Grille sans image".`);
+          }
+        }
+        return;
+      }
+
+      if (img || gridOnly.checked) {
+        drawGrid();
+        pushHistory();
+        setMsg("Scénario chargé. La grille a été appliquée.");
+      } else {
+        drawBase();
+        pushHistory();
+        setMsg("Scénario chargé. Il manque peut-être l'image d'origine : charge-la puis clique sur APPLIQUER.");
+      }
+    }
+
+    function saveScenarioJSON() {
+      const scenario = buildScenario();
+      const blob = new Blob([JSON.stringify(scenario, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href = url;
+      a.download = "quadrico_scenario.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      setMsg("Scénario sauvegardé (fichier JSON téléchargé).");
+    }
+
+    downloadBtn.addEventListener('click', saveScenarioJSON);
+
+    loadScenarioBtn.addEventListener('click', () => {
+      scenarioFileInput.value = "";
+      scenarioFileInput.click();
+    });
+
+    scenarioFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const data = JSON.parse(ev.target.result);
+          applyScenario(data, false);
+          if (sheets.length) {
+            sheets[currentSheetIndex].scenario = data;
+            refreshSheetSelect();
+          }
+        } catch (err) {
+          console.error(err);
+          setMsg("Erreur lors du chargement du scénario (JSON invalide ?).");
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    });
+
+    /* ==== GESTION FEUILLES ==== */
+
+    function refreshSheetSelect() {
+      sheetSelect.innerHTML = "";
+      sheets.forEach((sheet, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = sheet.name || ("Feuille " + (idx + 1));
+        if (idx === currentSheetIndex) opt.selected = true;
+        sheetSelect.appendChild(opt);
+      });
+    }
+
+    function initSheets() {
+      const baseScenario = buildScenario();
+      sheets = [
+        { name: "Feuille 1", scenario: baseScenario, imageData: null }
+      ];
+      currentSheetIndex = 0;
+      refreshSheetSelect();
+    }
+
+    function switchToSheet(index) {
+      if (index === currentSheetIndex) return;
+      if (sheets[currentSheetIndex]) {
+        sheets[currentSheetIndex].scenario = buildScenario();
+      }
+      currentSheetIndex = index;
+      const s = sheets[index].scenario;
+      applyScenario(s, true);
+      refreshSheetSelect();
+    }
+
+    sheetSelect.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.value, 10);
+      if (isNaN(idx)) return;
+      switchToSheet(idx);
+    });
+
+    addSheetBtn.addEventListener('click', () => {
+      if (sheets[currentSheetIndex]) {
+        sheets[currentSheetIndex].scenario = buildScenario();
+      }
+      const baseScenario = buildScenario();
+      const newIndex = sheets.length;
+      sheets.push({
+        name: "Feuille " + (newIndex + 1),
+        scenario: structuredClone(baseScenario),
+        imageData: null  // pas d'image copiée
+      });
+      currentSheetIndex = newIndex;
+      refreshSheetSelect();
+      applyScenario(sheets[newIndex].scenario, true);
+      setMsg(`Nouvelle feuille "Feuille ${newIndex + 1}" créée (sans image).`);
+    });
+
+    renameSheetBtn.addEventListener('click', () => {
+      const sheet = sheets[currentSheetIndex];
+      const newName = prompt("Nom de la feuille :", sheet.name || "");
+      if (newName && newName.trim()) {
+        sheet.name = newName.trim();
+        refreshSheetSelect();
+      }
+    });
+
+    // ⧉ : dupliquer la feuille actuellement affichée
+    duplicateSheet1Btn.addEventListener('click', () => {
+      if (!sheets.length || !sheets[currentSheetIndex].scenario) {
+        setMsg("La feuille actuelle n'a pas encore de scénario à copier (applique un quadrillage d'abord).");
+        return;
+      }
+      sheets[currentSheetIndex].scenario = buildScenario();
+
+      const baseScenario = structuredClone(sheets[currentSheetIndex].scenario);
+      const baseImage    = sheets[currentSheetIndex].imageData || null;
+      const baseName     = sheets[currentSheetIndex].name || ("Feuille " + (currentSheetIndex + 1));
+
+      const newIndex = sheets.length;
+      sheets.push({
+        name: "Copie " + baseName,
+        scenario: baseScenario,
+        imageData: baseImage
+      });
+
+      currentSheetIndex = newIndex;
+      refreshSheetSelect();
+      applyScenario(baseScenario, true);
+      setMsg(`Feuille copiée depuis "${baseName}".`);
+    });
+
+    deleteSheetBtn.addEventListener('click', () => {
+      if (sheets.length <= 1) {
+        alert("Impossible de supprimer la dernière feuille.");
+        return;
+      }
+      const sheet = sheets[currentSheetIndex];
+      const ok = confirm(`Supprimer la feuille "${sheet.name}" ?`);
+      if (!ok) return;
+      sheets.splice(currentSheetIndex, 1);
+      currentSheetIndex = Math.max(0, currentSheetIndex - 1);
+      refreshSheetSelect();
+      const s = sheets[currentSheetIndex].scenario;
+      applyScenario(s, true);
+      setMsg("Feuille supprimée.");
+    });
+
+    /* ==== COPIE / COLLE STYLE DE CASE ==== */
+
+    function getCellStyleForCopy(c, r) {
+      if (!lastGridGeom) return null;
+      const key = `${c},${r}`;
+      const base = selectedCells[key] || {};
+      const region = findRegionByCell(c, r);
+
+      let style = {
+        borderColor: null,
+        borderWidth: null,
+        text: "",
+        textColor: "",
+        alpha: 1.0,
+        fillColor: null,
+        fillAlpha: null,
+        noGrid: !!base.noGrid,
+        noCode: !!base.noCode
+      };
+
+      if (region) {
+        if (region.borderColor) style.borderColor = region.borderColor;
+        if (region.borderWidth) style.borderWidth = region.borderWidth;
+        if (region.text)       style.text        = region.text;
+        if (region.textColor)  style.textColor   = region.textColor;
+        if (typeof region.alpha === "number") style.alpha = region.alpha;
+        if (region.fillColor)  style.fillColor   = region.fillColor;
+        if (typeof region.fillAlpha === "number") style.fillAlpha = region.fillAlpha;
+      }
+
+      if (base.borderColor) style.borderColor = base.borderColor;
+      if (base.borderWidth) style.borderWidth = base.borderWidth;
+      if (base.text)        style.text        = base.text;
+      if (base.textColor)   style.textColor   = base.textColor;
+      if (typeof base.alpha === "number") style.alpha = base.alpha;
+      if (base.fillColor)   style.fillColor   = base.fillColor;
+      if (typeof base.fillAlpha === "number") style.fillAlpha = base.fillAlpha;
+
+      const hasSomething =
+        style.borderColor || style.borderWidth || style.text ||
+        style.fillColor || style.noGrid || style.noCode;
+
+      return hasSomething ? style : null;
+    }
+
+    function pasteCopiedStyle() {
+      if (!copiedCellStyle || !lastClickedCell || !lastGridGeom) return;
+
+      const { c, r } = lastClickedCell;
+      const key = `${c},${r}`;
+      const regionHere = findRegionByCell(c, r);
+      const st = copiedCellStyle;
+
+      pushHistory();
+
+      if (regionHere) {
+        regionHere.borderColor = st.borderColor || null;
+        regionHere.borderWidth = st.borderWidth || null;
+        regionHere.text        = st.text || "";
+        regionHere.textColor   = st.textColor || "";
+        regionHere.alpha       = (typeof st.alpha === "number") ? st.alpha : 1.0;
+        regionHere.fillColor   = st.fillColor || null;
+        regionHere.fillAlpha   = (typeof st.fillAlpha === "number") ? st.fillAlpha : null;
+
+        for (const cell of regionHere.cells) {
+          const k = `${cell.c},${cell.r}`;
+          const existing = selectedCells[k] || {};
+          if (st.noGrid) existing.noGrid = true; else delete existing.noGrid;
+          if (st.noCode) existing.noCode = true; else delete existing.noCode;
+          selectedCells[k] = existing;
+        }
+      } else {
+        const existing = selectedCells[key] || {};
+        selectedCells[key] = {
+          ...existing,
+          borderColor: st.borderColor || existing.borderColor,
+          borderWidth: st.borderWidth || existing.borderWidth,
+          text:        st.text,
+          textColor:   st.textColor || existing.textColor,
+          alpha:       (typeof st.alpha === "number") ? st.alpha : (existing.alpha ?? 1.0),
+          fillColor:   (st.fillColor !== null ? st.fillColor : existing.fillColor),
+          fillAlpha:   (typeof st.fillAlpha === "number" ? st.fillAlpha : existing.fillAlpha),
+          noGrid:      !!st.noGrid,
+          noCode:      !!st.noCode
+        };
+      }
+
+      drawGrid();
+      setMsg("Style copié collé sur la case sélectionnée.");
+    }
+
+    /* ==== RACCOURCIS CLAVIER ==== */
+
+    document.addEventListener('keydown', (e) => {
+      const tag = e.target.tagName;
+      const isInputField = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
+
+      // Entrée = APPLIQUER
+      if (e.key === 'Enter' && !isInputField) {
+        e.preventDefault();
+        drawGrid();
+        return;
+      }
+
+      // Delete = reset dernière case cliquée
+      if (e.key === 'Delete') {
+        if (lastClickedCell && lastGridGeom) {
+          e.preventDefault();
+          pushHistory();
+          resetCell(lastClickedCell.c, lastClickedCell.r);
+          drawGrid();
+          setMsg("Case réinitialisée (Suppr / Delete).");
+        }
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey) {
+        const key = e.key.toLowerCase();
+
+        if (key === 'z') {
+          e.preventDefault();
+          undoAction();
+        } else if (key === 'c') {
+          if (!lastClickedCell) return;
+          e.preventDefault();
+          const st = getCellStyleForCopy(lastClickedCell.c, lastClickedCell.r);
+          if (st) {
+            copiedCellStyle = st;
+            setMsg("Style de la case copié (bordure / texte / zone / flags).");
+          } else {
+            setMsg("Aucune modification à copier sur cette case.");
+          }
+        } else if (key === 'v') {
+          if (!copiedCellStyle || !lastClickedCell) return;
+          e.preventDefault();
+          pasteCopiedStyle();
+        }
+      }
+    });
+
+    /* ==== GOOGLE MAPS ==== */
+
+    mapsOpenBtn.addEventListener('click', () => {
+      const addr = (mapsAddress.value || "").trim();
+      if (!addr) {
+        setMsg("Saisis une adresse avant d'ouvrir Google Maps.");
+        return;
+      }
+      const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
+      window.open(url, "_blank");
+      setMsg("Ouverture de Google Maps avec l'adresse saisie.");
+    });
+
+    /* ==== INIT ==== */
+
+    function initSheets() {
+      const baseScenario = buildScenario();
+      sheets = [
+        { name: "Feuille 1", scenario: baseScenario, imageData: null }
+      ];
+      currentSheetIndex = 0;
+      refreshSheetSelect();
+    }
+
+    initSheets();
   </script>
 </body>
 </html>
