@@ -598,13 +598,14 @@
       color: #111827;
     }
 
+    /* TEXTE : NOIR EN CLAIR, BLANC EN SOMBRE */
     input[type="text"] {
       margin-left: 4px;
       padding: 2px 4px;
       border-radius: 6px;
       border: 1px solid #32394b;
       background: #090c14;
-      color: #111827;
+      color: var(--text-main); /* <- BLANC EN MODE SOMBRE */
       width: 130px;
     }
 
@@ -859,22 +860,64 @@
       .toolbar-main {
         top: 0;
         border-radius: 10px;
-        justify-content:center;
+        justify-content: center;
+        flex-wrap: wrap;
       }
-      .toolbar-main #undoBtn,
-      .toolbar-main #redoBtn,
-      .toolbar-main #undoDeleteBtn,
-      .toolbar-main #autoRefreshBtn,
-      .toolbar-main #orientationToggle,
-      .toolbar-main #resetBtn,
-      .toolbar-main #optionsToggle {
+
+      /* MODE MOBILE PAYSAGE : on garde le comportement actuel */
+      .mobile-landscape .toolbar-main #undoBtn,
+      .mobile-landscape .toolbar-main #redoBtn,
+      .mobile-landscape .toolbar-main #undoDeleteBtn,
+      .mobile-landscape .toolbar-main #autoRefreshBtn,
+      .mobile-landscape .toolbar-main #orientationToggle,
+      .mobile-landscape .toolbar-main #resetBtn,
+      .mobile-landscape .toolbar-main #optionsToggle {
         order: 1;
+        flex: 0 1 auto;
       }
-      .toolbar-main #drawBtn {
+      .mobile-landscape .toolbar-main #drawBtn {
         order: 2;
         flex-basis: 100%;
         max-width: 230px;
         justify-content: center;
+      }
+
+      /* MODE MOBILE PORTRAIT :
+         Ligne 1 : ↩ ↪ SUPPRIMER
+         Ligne 2 : Portrait/Paysage, Corbeille, AUTO
+         Ligne 3 : Options, APPLIQUER
+      */
+      .mobile-portrait .toolbar-main #undoBtn,
+      .mobile-portrait .toolbar-main #redoBtn,
+      .mobile-portrait .toolbar-main #undoDeleteBtn,
+      .mobile-portrait .toolbar-main #orientationToggle,
+      .mobile-portrait .toolbar-main #resetBtn,
+      .mobile-portrait .toolbar-main #autoRefreshBtn {
+        flex: 1 1 calc(33.33% - 6px);
+        max-width: none;
+      }
+
+      .mobile-portrait .toolbar-main #optionsToggle,
+      .mobile-portrait .toolbar-main #drawBtn {
+        flex: 1 1 calc(50% - 6px);
+        max-width: none;
+      }
+
+      .mobile-portrait .toolbar-main #undoBtn,
+      .mobile-portrait .toolbar-main #redoBtn,
+      .mobile-portrait .toolbar-main #undoDeleteBtn {
+        order: 1;
+      }
+
+      .mobile-portrait .toolbar-main #orientationToggle,
+      .mobile-portrait .toolbar-main #resetBtn,
+      .mobile-portrait .toolbar-main #autoRefreshBtn {
+        order: 2;
+      }
+
+      .mobile-portrait .toolbar-main #optionsToggle,
+      .mobile-portrait .toolbar-main #drawBtn {
+        order: 3;
       }
 
       .source-zoom-row {
@@ -1432,13 +1475,13 @@
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
               <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée, proportionnelle et orientation <strong>auto</strong> (portrait si la carte est verticale, paysage si elle est horizontale).</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail en rédaction avec sujet et texte pré-remplis. Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application mail (via <em>mailto:</em>). Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
               <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli. Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre Gmail pour envoyer un mail au concepteur, avec destinataire, objet et message de base pré-remplis.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre ton application mail avec destinataire, objet et message de base pré-remplis pour contacter le concepteur.</li>
         </ul>
       </details>
 
@@ -1673,7 +1716,7 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact : texte complet seulement au survol + Gmail pré-rempli au clic
+    // Bouton de contact : texte complet seulement au survol + MAILTO au clic
     contactBtn.addEventListener('mouseenter', () => {
       setIconHint("Envoyer un mail au concepteur de QuadRico");
       contactInfo.textContent =
@@ -1689,11 +1732,11 @@
         "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
       );
       const url =
-        "https://mail.google.com/mail/?view=cm&fs=1" +
-        "&to=" + encodeURIComponent("eric.marchetti@gendarmerie.interieur.gouv.fr") +
-        "&su=" + subject +
+        "mailto:" +
+        encodeURIComponent("eric.marchetti@gendarmerie.interieur.gouv.fr") +
+        "?subject=" + subject +
         "&body=" + body;
-      window.open(url, "_blank");
+      window.location.href = url;
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -1729,13 +1772,30 @@
       }
     }
 
+    function updateMobileOrientationClasses() {
+      document.body.classList.remove('mobile-portrait', 'mobile-landscape');
+      if (window.innerWidth <= 900) {
+        if (window.innerHeight >= window.innerWidth) {
+          document.body.classList.add('mobile-portrait');
+        } else {
+          document.body.classList.add('mobile-landscape');
+        }
+      }
+    }
+
     window.addEventListener('resize', () => {
       if (window.innerWidth > 900) {
         document.body.classList.remove('options-collapsed');
       }
+      updateMobileOrientationClasses();
+    });
+
+    window.addEventListener('orientationchange', () => {
+      updateMobileOrientationClasses();
     });
 
     initOptionsCollapsedOnLoad();
+    updateMobileOrientationClasses();
 
     // Chargement d'image + stockage dans la feuille
     imageLoader.addEventListener('change', function (e) {
@@ -2803,6 +2863,7 @@
 
       setMsg("Réinitialisé. Charge une nouvelle image ou active \"Grille sans image\" pour recommencer.");
       initOptionsCollapsedOnLoad();
+      updateMobileOrientationClasses();
     });
 
     zoomRange.addEventListener('input', () => {
@@ -2958,6 +3019,7 @@
     window.addEventListener('load', () => {
       openWelcome();
       updateAutoRefreshButton();
+      updateMobileOrientationClasses();
     });
 
     /* ==== SAUVEGARDE / CHARGEMENT SCÉNARIO ==== */
@@ -3494,13 +3556,10 @@
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
         "Merci de l'ajouter en pièce jointe à ce mail avant envoi."
       );
-      const url =
-        "https://mail.google.com/mail/?view=cm&fs=1" +
-        "&su=" + subject +
-        "&body=" + body;
-      window.open(url, "_blank");
+      const url = "mailto:?subject=" + subject + "&body=" + body;
+      window.location.href = url;
 
-      setMsg("PNG téléchargé. Une fenêtre Gmail s'ouvre pour envoyer le mail (ajoute le fichier en pièce jointe).");
+      setMsg("PNG téléchargé. Ton application mail s'ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
