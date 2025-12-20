@@ -222,6 +222,7 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-start;
+      margin: 0 auto;
     }
 
     .source-box,
@@ -305,7 +306,7 @@
       text-align: center;
     }
 
-    /* Toolbar APPLIQUER / SUPPRIMER – STICKY */
+    /* Toolbar APPLIQUER / SUPPRIMER – STICKY (PC uniquement, mobile géré plus bas) */
 
     .toolbar-main {
       display: flex;
@@ -911,8 +912,10 @@
         margin: 0 auto;
       }
 
+      /* le bandeau n'est plus figé sur mobile */
       .toolbar-main {
-        top: 0;
+        position: static;
+        top: auto;
         border-radius: 10px;
         justify-content: center;
         flex-wrap: wrap;
@@ -972,10 +975,13 @@
 
       .mobile-portrait .toolbar-main #optionsToggle { order: 5; }
 
-      /* CENTRAGE DES BLOCS SOURCE / FEUILLES / PARAMÈTRES / LÉGENDE */
+      /* CENTRAGE DES BLOCS SOURCE / FEUILLES / GRILLE / LÉGENDE */
       .source-zoom-row {
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 0 auto;
       }
       .source-zoom-row > .source-box,
       .source-zoom-row > .mid-box,
@@ -1274,7 +1280,7 @@
         <div class="group group-full">
           <strong>Sélection de case</strong>
 
-          <!-- ICÔNE "?" + TEXTE RÉSUMÉ (version raccourcie) -->
+          <!-- ICÔNE "?" -->
           <div id="zoneHelpWrapper" class="zone-help-wrapper">
             <button id="fillHelpIcon" type="button" class="case-help-btn">?</button>
             <div id="fillHelpTooltip" class="help-tooltip-inline hidden">
@@ -1293,10 +1299,15 @@
             </div>
           </div>
 
-          <div class="selection-modes">
+          <!-- Ligne 1 : APPLIQUER -->
+          <div class="selection-modes selection-row-1">
             <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
               <span class="icon">✎</span> Appliquer
             </button>
+          </div>
+
+          <!-- Ligne 2 : Effacer bordure + Effacer texte/croix -->
+          <div class="selection-modes selection-row-2">
             <button id="modeEraseBorder" class="selection-mode-btn" type="button" title="Effacer bordure / quadrillage">
               <span class="icon">⬚</span> Effacer bordure
             </button>
@@ -1305,7 +1316,8 @@
             </button>
           </div>
 
-          <div class="selection-modes-second">
+          <!-- Ligne 3 : Fusionner + Fractionner + Réinitialiser -->
+          <div class="selection-modes-second selection-row-3">
             <button id="modeMerge" class="selection-mode-btn" type="button" title="Fusionner les cases">
               <span class="icon">▩</span> Fusionner
             </button>
@@ -1517,13 +1529,13 @@
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
               <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée et une orientation de page adaptée à la forme de la carte.</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail Web avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application de messagerie (lien mailto) avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
               <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre un mail de contact vers le concepteur dans Gmail Web.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre ton application de messagerie vers le concepteur (lien mailto).</li>
         </ul>
       </details>
 
@@ -1773,9 +1785,9 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact (passe sur Gmail Web)
+    // Bouton de contact (mailto pour PC + téléphone)
     contactBtn.addEventListener('mouseenter', () => {
-      setIconHint("Envoyer un mail au concepteur de QuadRico");
+      setIconHint("Envoyer un mail au concepteur de QuadRico (ouvre ton appli de messagerie).");
       contactInfo.textContent =
         "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
     });
@@ -1785,16 +1797,14 @@
     });
     contactBtn.addEventListener('click', () => {
       const to = "eric.marchetti@gendarmerie.interieur.gouv.fr";
-      const subject = encodeURIComponent("QuadRico - remarques / améliorations");
-      const body = encodeURIComponent(
-        "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
-      );
-      const url =
-        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
-        "&to=" + encodeURIComponent(to) +
-        "&su=" + subject +
-        "&body=" + body;
-      window.open(url, "_blank");
+      const subjectText = "QuadRico - remarques / améliorations";
+      const bodyText =
+        "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n";
+      const mailtoUrl =
+        "mailto:" + encodeURIComponent(to) +
+        "?subject=" + encodeURIComponent(subjectText) +
+        "&body=" + encodeURIComponent(bodyText);
+      window.location.href = mailtoUrl;
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -2807,7 +2817,7 @@
         return;
       }
 
-      // Fonctionnement revenu comme avant : orientation cohérente avec la forme du canvas
+      // orientation cohérente avec la forme du canvas
       const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
 
       const dataUrl = canvas.toDataURL("image/png");
@@ -3590,20 +3600,20 @@
       link.download = fileName;
       link.click();
 
-      const subject = encodeURIComponent("QuadRico - Carte quadrillée");
-      const body = encodeURIComponent(
+      const subjectText = "QuadRico - Carte quadrillée";
+      const bodyText =
         "Carte générée avec QuadRico.\n\n" +
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
-        "Merci de l'ajouter en pièce jointe au mail avant envoi."
-      );
-      const url =
-        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
-        "&su=" + subject +
-        "&body=" + body;
+        "Merci de l'ajouter en pièce jointe au mail avant envoi.\n";
 
-      window.open(url, "_blank");
+      const mailtoUrl =
+        "mailto:" +
+        "?subject=" + encodeURIComponent(subjectText) +
+        "&body=" + encodeURIComponent(bodyText);
 
-      setMsg("PNG téléchargé. Gmail Web s’ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
+      window.location.href = mailtoUrl;
+
+      setMsg("PNG téléchargé. Ton application de messagerie s'ouvre (ajoute le fichier en pièce jointe).");
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
