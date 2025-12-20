@@ -15,6 +15,9 @@
       --accent: #2f81ff;
       --accent-soft: rgba(47,129,255,0.15);
       --danger: #ff4b5c;
+      --danger-soft: rgba(255,75,92,0.18);
+      --success: #22c55e;
+      --success-soft: rgba(34,197,94,0.18);
       --btn-bg: #1e2330;
       --btn-bg-hover: #272d3c;
       --canvas-bg: #000000;
@@ -29,6 +32,9 @@
       --accent: #2563eb;
       --accent-soft: rgba(37,99,235,0.08);
       --danger: #dc2626;
+      --danger-soft: rgba(220,38,38,0.12);
+      --success: #16a34a;
+      --success-soft: rgba(22,163,74,0.12);
       --btn-bg: #f3f4f6;
       --btn-bg-hover: #e5e7eb;
       --canvas-bg: #ffffff;
@@ -118,6 +124,7 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
     }
 
     .top-icon-btn {
@@ -147,15 +154,10 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.6);
     }
 
-    .top-icon-btn.reset      { border-color: var(--danger); }
-    .top-icon-btn.printA4    { border-color: #4adf7c; }
-    .top-icon-btn.printA3    { border-color: #22c55e; }
-    .top-icon-btn.download   { border-color: var(--accent); }
     .top-icon-btn.contact    { border-color: #facc15; }
     .top-icon-btn.briefing   { border-color: #a855f7; }
-    .top-icon-btn.save       { border-color: #22c55e; }
-    .top-icon-btn.load       { border-color: #3b82f6; }
     .top-icon-btn.help       { border-color: #e5e7eb; }
+    .top-icon-btn.export     { border-color: var(--accent); background: var(--accent-soft); }
 
     #optionsToggle {
       display: none;
@@ -166,6 +168,56 @@
       color: var(--text-sub);
       min-height: 16px;
       text-align: center;
+    }
+
+    /* MENU EXPORT */
+
+    .export-menu-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .export-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 10px;
+      padding: 6px 0;
+      min-width: 250px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.65);
+      z-index: 900;
+    }
+
+    .export-menu button {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-main);
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .export-menu button span.icon {
+      font-size: 16px;
+      width: 18px;
+      text-align: center;
+    }
+
+    .export-menu button:hover {
+      background: var(--accent-soft);
+    }
+
+    .hidden {
+      display: none;
     }
 
     /* Ligne Source + mid-box + Zoom */
@@ -319,43 +371,86 @@
       box-shadow: 0 2px 7px rgba(148,163,184,0.7);
     }
 
+    /* APPLIQUER (vert) */
     #drawBtn {
       font-size: 17px;
       font-weight: 600;
       min-width: 180px;
       padding: 14px 16px;
       border-radius: 18px;
-      border: 1px solid var(--accent);
-      background: var(--accent-soft);
+      border: 1px solid var(--success);
+      background: var(--success-soft);
       color: var(--text-main);
-      box-shadow: 0 0 10px rgba(30,64,175,0.8);
+      box-shadow: 0 0 10px rgba(34,197,94,0.7);
     }
 
     #drawBtn:hover {
-      background: rgba(47,129,255,0.23);
+      background: rgba(34,197,94,0.27);
       transform: translateY(-1px);
     }
 
+    /* SUPPRIMER (rouge) */
     #undoDeleteBtn {
       font-size: 14px;
       min-width: 150px;
       padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid #2c3345;
-      background: var(--btn-bg);
+      border: 1px solid var(--danger);
+      background: var(--danger-soft);
       color: var(--text-main);
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
 
     :root[data-theme="light"] #undoDeleteBtn {
-      border-color: #d1d5db;
       box-shadow: 0 2px 7px rgba(148,163,184,0.7);
     }
 
     #undoDeleteBtn:hover {
-      background: var(--btn-bg-hover);
+      background: rgba(220,38,38,0.22);
       transform: translateY(-1px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    /* AUTO (bleu, taille = SUPPRIMER) */
+    #autoRefreshBtn {
+      font-size: 14px;
+      min-width: 150px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--text-main);
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+
+    :root[data-theme="light"] #autoRefreshBtn {
+      box-shadow: 0 2px 7px rgba(148,163,184,0.7);
+    }
+
+    #autoRefreshBtn:hover {
+      background: rgba(37,99,235,0.22);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    /* Portrait / Paysage dans la toolbar */
+    #orientationToggle {
+      border-color: var(--accent);
+    }
+
+    :root[data-theme="light"] #orientationToggle {
+      border-color: var(--accent);
+    }
+
+    /* Reset dans la toolbar */
+    #resetBtn {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    :root[data-theme="light"] #resetBtn {
+      border-color: var(--danger);
+      background: var(--danger-soft);
     }
 
     /* Feuilles dans le bandeau */
@@ -509,7 +604,7 @@
       border-radius: 6px;
       border: 1px solid #32394b;
       background: #090c14;
-      color: var(--text-main);
+      color: #111827;
       width: 130px;
     }
 
@@ -646,10 +741,6 @@
       display: none !important;
     }
 
-    .hidden {
-      display: none;
-    }
-
     .help-modal {
       position: relative;
       background: var(--bg-panel);
@@ -774,6 +865,8 @@
       .toolbar-main #redoBtn,
       .toolbar-main #undoDeleteBtn,
       .toolbar-main #autoRefreshBtn,
+      .toolbar-main #orientationToggle,
+      .toolbar-main #resetBtn,
       .toolbar-main #optionsToggle {
         order: 1;
       }
@@ -811,8 +904,15 @@
       canvas {
         height: auto;
       }
+
+      .export-menu {
+        right: auto;
+        left: 0;
+      }
     }
   </style>
+  <!-- jsPDF pour export PDF direct -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header class="header">
@@ -835,40 +935,50 @@
       <button id="themeToggle" class="top-icon-btn" aria-label="Basculer mode jour/sombre">
         <span class="theme-toggle-icon">☯</span>
       </button>
-      <button id="orientationToggle" class="top-icon-btn" aria-label="Portrait / Paysage">
-        🖼️↕
-      </button>
+      <!-- Portrait / Paysage déplacé dans la toolbar -->
       <button id="fullscreenToggle" class="top-icon-btn" aria-label="Basculer plein écran">
         ⛶
       </button>
       <button id="briefingBtn" class="top-icon-btn briefing" aria-label="Mode briefing">
         🎬
       </button>
-      <!-- PNG -->
-      <button id="saveScenarioBtn" class="top-icon-btn save" aria-label="Enregistrer l'image PNG">
-        💾
-      </button>
-      <!-- JSON load + JSON download -->
-      <button id="loadScenarioBtn" class="top-icon-btn load" aria-label="Charger scénario JSON">
-        📂
-      </button>
-      <button id="downloadBtn" class="top-icon-btn download" aria-label="Télécharger scénario JSON">
-        ⬇
-      </button>
-      <!-- Aide + impression + reset + contact -->
+
+      <!-- Aide + contact (GUIDE DÉTAILLÉ ici) -->
       <button id="helpBtn" class="top-icon-btn help" aria-label="Aide détaillée / guide rapide">
         ❓
       </button>
-      <button id="printBtn" class="top-icon-btn printA4" aria-label="Imprimer A4">
-        🖨 A4
-      </button>
-      <button id="printA3Btn" class="top-icon-btn printA3" aria-label="Imprimer A3">
-        🖨 A3
-      </button>
-      <button id="resetBtn" class="top-icon-btn reset" aria-label="Effacer / Reset">
-        🗑
-      </button>
-      <button id="contactBtn" class="top-icon-btn contact" aria-label="Contact">
+
+      <!-- MENU EXPORT / IMPRESSION (déplacé après le guide) -->
+      <div class="export-menu-wrapper">
+        <button id="exportMenuBtn" class="top-icon-btn export" aria-label="Exporter / imprimer">
+          📤
+        </button>
+        <div id="exportMenu" class="export-menu hidden">
+          <button id="exportPngBtn" type="button">
+            <span class="icon">🖼️</span> Enregistrer l'image en PNG
+          </button>
+          <button id="exportPdfBtn" type="button">
+            <span class="icon">📄</span> Enregistrer en PDF
+          </button>
+          <button id="exportGridOnlyBtn" type="button">
+            <span class="icon">#</span> Enregistrer le quadrillage (sans la carto)
+          </button>
+          <button id="exportPrintBtn" type="button">
+            <span class="icon">🖨️</span> Imprimer
+          </button>
+          <button id="exportMailBtn" type="button">
+            <span class="icon">✉</span> Envoyer par mail
+          </button>
+          <button id="exportWhatsappBtn" type="button">
+            <span class="icon">💬</span> Envoyer par WhatsApp
+          </button>
+          <button id="loadScenarioBtn" type="button">
+            <span class="icon">📂</span> Charger scénario QuadRico (.json)
+          </button>
+        </div>
+      </div>
+
+      <button id="contactBtn" class="top-icon-btn contact" aria-label="Mail concepteur QuadRico">
         ✉
       </button>
     </div>
@@ -972,7 +1082,13 @@
           APPLIQUER
         </button>
         <button id="autoRefreshBtn" class="undo-redo-btn" title="Rafraîchissement auto">
-          ⟳ AUTO
+          AUTO
+        </button>
+        <button id="orientationToggle" class="undo-redo-btn" aria-label="Portrait / Paysage (affichage)">
+          🖼️↕
+        </button>
+        <button id="resetBtn" class="undo-redo-btn" aria-label="Effacer / Reset">
+          🗑
         </button>
         <button id="optionsToggle" class="undo-redo-btn" aria-label="Afficher / masquer les options">
           ⚙
@@ -1063,6 +1179,10 @@
           <label>
             <span>Code / Croix :</span>
             <input type="range" id="codeOpacity" min="0" max="100" value="100">
+          </label>
+          <label>
+            <span>Zone colorée :</span>
+            <input type="range" id="fillOpacity" min="0" max="100" value="35">
           </label>
         </div>
 
@@ -1159,14 +1279,13 @@
               <option value="rgba(0,0,0,0.6)">Noir</option>
             </select>
           </label>
-          <label>
-            <span>Opacité de zone :</span>
-            <input type="range" id="fillOpacity" min="0" max="100" value="35">
-          </label>
 
           <small style="font-size:11px;color:var(--text-sub); white-space:normal;">
             Clique directement sur une case pour appliquer l'action choisie.<br>
             Si un texte est défini, croix et codes sont désactivés pour cette case.<br>
+            L’opacité de la zone colorée dépend du curseur « Zone colorée » (section <strong>Opacité</strong>) au moment où tu valides.<br>
+            Pour modifier l’opacité d’une case déjà colorée : reclique sur la case puis ajuste le curseur « Zone colorée ».  
+            Si <strong>AUTO</strong> est activé, la case se met à jour en direct ; sinon, clique de nouveau sur <strong>APPLIQUER</strong>.<br>
             Utilise ↩ / ↪ ou <strong>Ctrl + Z</strong> pour revenir en arrière.<br>
             Utilise <strong>Ctrl + C / Ctrl + V</strong> pour copier / coller le style de la dernière case cliquée.<br>
             Touche <strong>Entrée</strong> = bouton <strong>APPLIQUER</strong>.<br>
@@ -1189,7 +1308,7 @@
       <p><strong>3.</strong> Choisis ton type de quadrillage puis clique sur <strong>APPLIQUER</strong> (ou touche <strong>Entrée</strong>).</p>
       <p><strong>4.</strong> Clique sur les cases pour :</p>
       <ul>
-        <li>ajouter bordure / texte / zone colorée,</li>
+        <li>ajouter bordure / texte / zone colorée (avec l’opacité choisie dans « Opacité &gt; Zone colorée »),</li>
         <li>effacer bordure ou texte,</li>
         <li>fusionner / fractionner / réinitialiser une case.</li>
       </ul>
@@ -1197,7 +1316,8 @@
         Entrée (APPLIQUER), Ctrl + Z (annuler), Ctrl + C / Ctrl + V (copier / coller le style),  
         Ctrl + molette (zoom), Suppr (Delete) = réinitialiser la dernière case cliquée.
       </p>
-      <p>Pour plus de détails, clique sur <strong>❓</strong> ou active <strong>⟳ AUTO</strong> à droite d’APPLIQUER pour le rafraîchissement automatique.</p>
+      <p>Pour l’export, utilise le bouton <strong>📤</strong> (PNG, PDF, quadrillage seul, impression, mail, WhatsApp, scénario).  
+         Pour plus de détails, clique sur <strong>❓</strong> ou active <strong>AUTO</strong> à droite d’APPLIQUER pour le rafraîchissement automatique.</p>
     </div>
   </div>
 
@@ -1213,6 +1333,8 @@
           <li><strong>Image</strong> : importe une photo (satellite, plan, croquis, etc.).</li>
           <li><strong>Adresse Google Maps</strong> : saisis une adresse ou un lieu puis 🔍 pour ouvrir dans un nouvel onglet.</li>
           <li><strong>Grille sans image</strong> : quadrillage seul (fond noir / blanc selon le thème).</li>
+          <li><strong>Bouton 🖼️↕ / 🖼️↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage) pour adapter la vue.  
+              L’orientation d’<strong>impression</strong>, elle, reste automatisée en fonction de la forme de la carte.</li>
         </ul>
       </details>
 
@@ -1222,7 +1344,7 @@
           <li><strong>Colonnes / Lignes</strong> : taille de la grille (A1, B3, …).</li>
           <li><strong>Quadrillage</strong> : aucun / noir / rouge / FSI.</li>
           <li><strong>Légende</strong> : pas de légende / partielle / totale (4 côtés).</li>
-          <li><strong>Rafraîchissement auto (⟳ AUTO)</strong> : si activé, la carte se met à jour dès que tu modifies un paramètre.</li>
+          <li><strong>Rafraîchissement auto (AUTO)</strong> : si activé, la carte se met à jour dès que tu modifies un paramètre général (grille, opacité, etc.).</li>
           <li>Les colonnes suivent la logique <strong>A, B, …, Z, AA, AB, …</strong>.</li>
         </ul>
       </details>
@@ -1234,11 +1356,19 @@
           <li><strong>Croix</strong> : noir, rouge ou FSI (une seule couleur à la fois).</li>
           <li><strong>Couleur de zone</strong> :
             <ul>
-              <li><em>(néant)</em> : aucune zone colorée (efface la zone sur la case).</li>
+              <li><em>(néant)</em> : aucune zone colorée pour la case (ou suppression de la zone existante).</li>
               <li>Couleur (rouge, vert, …) : zone colorée semi-transparente.</li>
             </ul>
           </li>
-          <li><strong>Opacité de zone</strong> : transparence de la zone colorée.</li>
+          <li><strong>Opacité de zone</strong> :
+            <ul>
+              <li>Réglée par le curseur « Zone colorée » dans la section <strong>Opacité</strong>.</li>
+              <li>Lors de la création : la valeur du curseur au moment où tu cliques sur <strong>APPLIQUER</strong> est mémorisée pour la case.</li>
+              <li>Pour modifier l’opacité d’une case déjà colorée : reclique sur la case, puis ajuste le curseur.  
+                  Si <strong>AUTO</strong> est activé, l’opacité change en direct ; sinon, clique à nouveau sur <strong>APPLIQUER</strong>.</li>
+              <li>Chaque case garde sa propre opacité, indépendamment des autres.</li>
+            </ul>
+          </li>
         </ul>
       </details>
 
@@ -1248,7 +1378,7 @@
           <li><strong>Couleur de bordure</strong> :
             <ul>
               <li><em>(néant)</em> : supprime la couleur personnalisée et revient à la <strong>couleur du quadrillage de base</strong> pour la case.</li>
-              <li>Couleur (noir, rouge, …) : bordure forcée dans cette couleur.</li>
+              <li>Couleur (noir, rouge, …) : bordure forcée dans cette couleur (utile pour délimiter une zone).</li>
             </ul>
           </li>
           <li><strong>Épaisseur</strong> :
@@ -1266,12 +1396,13 @@
         <summary>5. Travail par case</summary>
         <ul>
           <li>Clique directement sur une case pour appliquer l'action :</li>
-          <li><strong>Appliquer</strong> : bordure + texte + zone colorée selon les réglages.</li>
+          <li><strong>Appliquer</strong> : bordure + texte + zone colorée selon les réglages, avec l’opacité choisie.</li>
           <li><strong>Effacer bordure</strong> : supprime le trait (ou le trait du bloc fusionné).</li>
           <li><strong>Effacer texte/croix</strong> : supprime texte, codes et croix.</li>
-          <li><strong>Fusionner / Fractionner</strong> : créer ou casser des blocs multi-cases.</li>
+          <li><strong>Fusionner / Fractionner</strong> : créer ou casser des blocs multi-cases (uniquement pour la bordure et le texte).  
+              La <strong>couleur de zone et son opacité</strong> restent gérées case par case, même si les cases sont fusionnées.</li>
           <li><strong>Réinitialiser la case</strong> : revient à la case d’origine.</li>
-          <li><strong>Ctrl + C / Ctrl + V</strong> : copie / colle le style d’une case (bordure, texte, zone…).</li>
+          <li><strong>Ctrl + C / Ctrl + V</strong> : copie / colle le style d’une case (bordure, texte, zone, opacité…).</li>
           <li><strong>Suppr (Delete)</strong> : réinitialiser la dernière case cliquée.</li>
         </ul>
       </details>
@@ -1288,18 +1419,26 @@
       </details>
 
       <details>
-        <summary>7. Export & briefing (icônes du haut)</summary>
+        <summary>7. Export, impression & briefing (icônes de contrôle)</summary>
         <ul>
           <li><strong>☯</strong> : mode sombre / clair.</li>
-          <li><strong>🖼️↕ / 🖼️↔</strong> : portrait / paysage.</li>
+          <li><strong>🖼️↕ / 🖼️↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage).  
+              L’orientation papier est choisie automatiquement au moment de l’<strong>impression</strong> ou du <strong>PDF</strong> selon la forme de la carte visible.</li>
           <li><strong>⛶</strong> : plein écran.</li>
           <li><strong>🎬</strong> : mode briefing (affiche uniquement la carte).</li>
-          <li><strong>💾</strong> : enregistre l’image en PNG.</li>
-          <li><strong>📂</strong> : charge un scénario JSON.</li>
-          <li><strong>⬇</strong> : télécharge le scénario JSON.</li>
-          <li><strong>🖨 A4 / 🖨 A3</strong> : impression PDF A4 / A3.</li>
+          <li><strong>📤 Export / Imprimer</strong> (menu déroulant) :
+            <ul>
+              <li><strong>Enregistrer l'image en PNG</strong> : exporte la carte quadrillée en image.</li>
+              <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
+              <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
+              <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée, proportionnelle et orientation <strong>auto</strong> (portrait si la carte est verticale, paysage si elle est horizontale).</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail en rédaction avec sujet et texte pré-remplis. Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
+              <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli. Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
+              <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
+            </ul>
+          </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> : mail de contact.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre Gmail pour envoyer un mail au concepteur, avec destinataire, objet et message de base pré-remplis.</li>
         </ul>
       </details>
 
@@ -1331,9 +1470,7 @@
     const ctx           = canvas.getContext('2d');
     const drawBtn       = document.getElementById('drawBtn');
     const undoDeleteBtn = document.getElementById('undoDeleteBtn');
-    const downloadBtn   = document.getElementById('downloadBtn');
-    const printBtn      = document.getElementById('printBtn');
-    const printA3Btn    = document.getElementById('printA3Btn');
+
     const resetBtn      = document.getElementById('resetBtn');
     const msg           = document.getElementById('msg');
 
@@ -1354,6 +1491,7 @@
     const imageOpacity  = document.getElementById('imageOpacity');
     const gridOpacity   = document.getElementById('gridOpacity');
     const codeOpacity   = document.getElementById('codeOpacity');
+    const fillOpacityEl = document.getElementById('fillOpacity');
 
     const zoomRange     = document.getElementById('zoomRange');
     const zoomValue     = document.getElementById('zoomValue');
@@ -1363,7 +1501,6 @@
     const textColorEl   = document.getElementById('textColor');
     const cellTextEl    = document.getElementById('cellText');
     const fillColorEl   = document.getElementById('fillColor');
-    const fillOpacityEl = document.getElementById('fillOpacity');
 
     const themeToggle   = document.getElementById('themeToggle');
     const orientationToggle = document.getElementById('orientationToggle');
@@ -1380,7 +1517,6 @@
     const modeSplitBtn       = document.getElementById('modeSplit');
     const modeResetBtn       = document.getElementById('modeReset');
 
-    const saveScenarioBtn    = document.getElementById('saveScenarioBtn');
     const loadScenarioBtn    = document.getElementById('loadScenarioBtn');
     const scenarioFileInput  = document.getElementById('scenarioFileInput');
 
@@ -1400,6 +1536,15 @@
     const mapsAddress        = document.getElementById('mapsAddress');
     const mapsOpenBtn        = document.getElementById('mapsOpenBtn');
 
+    const exportMenuBtn      = document.getElementById('exportMenuBtn');
+    const exportMenu         = document.getElementById('exportMenu');
+    const exportPngBtn       = document.getElementById('exportPngBtn');
+    const exportPdfBtn       = document.getElementById('exportPdfBtn');
+    const exportGridOnlyBtn  = document.getElementById('exportGridOnlyBtn');
+    const exportPrintBtn     = document.getElementById('exportPrintBtn');
+    const exportMailBtn      = document.getElementById('exportMailBtn');
+    const exportWhatsappBtn  = document.getElementById('exportWhatsappBtn');
+
     let selectionAction = "apply";
 
     let img = null;
@@ -1417,9 +1562,7 @@
     let history = [];
     let historyIndex = -1;
 
-    let orientationMode = "portrait";
-    let printOrientation = "portrait";
-
+    let orientationMode = "portrait"; // affichage (rotation 0° / 90°)
     let briefingMode = false;
 
     let baseCanvasWidth = 0;
@@ -1482,12 +1625,11 @@
     function updateOrientationButton() {
       if (orientationMode === "portrait") {
         orientationToggle.textContent = "🖼️↕";
-        orientationToggle.title = "Mode portrait (affichage et impression)";
+        orientationToggle.title = "Mode portrait (affichage)";
       } else {
         orientationToggle.textContent = "🖼️↔";
-        orientationToggle.title = "Mode paysage (affichage et impression)";
+        orientationToggle.title = "Mode paysage (affichage)";
       }
-      printOrientation = orientationMode;
     }
 
     orientationToggle.addEventListener('click', () => {
@@ -1521,24 +1663,37 @@
     }
 
     addIconHint(themeToggle,      "Basculer entre mode sombre et mode clair");
-    addIconHint(orientationToggle,"Basculer entre portrait et paysage (affichage & impression)");
+    addIconHint(orientationToggle,"Portrait / Paysage (affichage uniquement, rotation de la carte)");
     addIconHint(fullscreenToggle, "Basculer en mode plein écran");
     addIconHint(briefingBtn,      "Mode briefing : la carte est mise en avant, les options sont masquées.");
-    addIconHint(saveScenarioBtn,  "Enregistrer l'image quadrillée en PNG");
     addIconHint(loadScenarioBtn,  "Charger un scénario QuadRico (.json)");
-    addIconHint(downloadBtn,      "Télécharger le scénario (JSON)");
     addIconHint(helpBtn,          "Afficher le guide détaillé QuadRico");
-    addIconHint(printBtn,         "Imprimer / exporter en PDF A4");
-    addIconHint(printA3Btn,       "Imprimer / exporter en PDF A3");
     addIconHint(resetBtn,         "Réinitialiser tous les réglages et effacer la grille");
-    addIconHint(contactBtn,       "Envoyer un mail au concepteur de QuadRico");
     addIconHint(optionsToggle,    "Afficher / masquer le bloc options (mode mobile)");
-    addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre.");
+    addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
+    addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    contactBtn.addEventListener('click', () => {
+    // Bouton de contact : texte complet seulement au survol + Gmail pré-rempli au clic
+    contactBtn.addEventListener('mouseenter', () => {
+      setIconHint("Envoyer un mail au concepteur de QuadRico");
       contactInfo.textContent =
         "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
-      window.location.href = "mailto:eric.marchetti@gendarmerie.interieur.gouv.fr";
+    });
+    contactBtn.addEventListener('mouseleave', () => {
+      setIconHint("");
+      contactInfo.textContent = "";
+    });
+    contactBtn.addEventListener('click', () => {
+      const subject = encodeURIComponent("QuadRico - remarques / améliorations");
+      const body = encodeURIComponent(
+        "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
+      );
+      const url =
+        "https://mail.google.com/mail/?view=cm&fs=1" +
+        "&to=" + encodeURIComponent("eric.marchetti@gendarmerie.interieur.gouv.fr") +
+        "&su=" + subject +
+        "&body=" + body;
+      window.open(url, "_blank");
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -1602,7 +1757,6 @@
             sheets[currentSheetIndex].imageData = dataUrl;
           }
           drawBase();
-          downloadBtn.disabled = false;
           if (autoRefresh.checked) {
             drawGrid();
           }
@@ -1678,35 +1832,41 @@
 
       if (useGridOnly || !img) {
         const cellSize = 40;
-        if (orientationMode === "portrait") {
-          imgW = cols * cellSize;
-          imgH = rows * cellSize;
-        } else {
-          imgW = rows * cellSize;
-          imgH = cols * cellSize;
-        }
+        imgW = cols * cellSize;
+        imgH = rows * cellSize;
       } else {
-        if (orientationMode === "portrait") {
-          imgW = img.width;
-          imgH = img.height;
-        } else {
-          imgW = img.height;
-          imgH = img.width;
-        }
+        imgW = img.width;
+        imgH = img.height;
       }
 
-      canvas.width  = imgW + 2 * MARGIN_LEFT;
-      canvas.height = imgH + 2 * MARGIN_TOP;
+      const cellW = imgW / cols;
+      const cellH = imgH / rows;
+      const totalW = imgW + 2 * MARGIN_LEFT;
+      const totalH = imgH + 2 * MARGIN_TOP;
+
+      if (orientationMode === "portrait") {
+        canvas.width  = totalW;
+        canvas.height = totalH;
+      } else {
+        canvas.width  = totalH;
+        canvas.height = totalW;
+      }
 
       baseCanvasWidth = canvas.width;
       baseCanvasHeight = canvas.height;
       applyZoomScale();
 
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (orientationMode === "landscape") {
+        // Rotation 90° sens horaire : (x', y') = (y, -x + totalW)
+        ctx.setTransform(0, -1, 1, 0, 0, totalW);
+      }
 
       if (!useGridOnly) {
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, totalW, totalH);
       }
 
       const imgAlpha = parseInt(imageOpacity.value, 10) / 100;
@@ -1714,21 +1874,11 @@
       if (!useGridOnly && img) {
         ctx.save();
         ctx.globalAlpha = imgAlpha;
-
-        if (orientationMode === "portrait") {
-          ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
-        } else {
-          ctx.translate(MARGIN_LEFT, MARGIN_TOP + imgH);
-          ctx.rotate(-Math.PI / 2);
-          ctx.drawImage(img, 0, 0);
-        }
-
+        ctx.drawImage(img, MARGIN_LEFT, MARGIN_TOP);
         ctx.restore();
       }
 
-      const cellW = imgW / cols;
-      const cellH = imgH / rows;
-      lastGridGeom = { cols, rows, cellW, cellH, imgW, imgH };
+      lastGridGeom = { cols, rows, cellW, cellH, imgW, imgH, totalW, totalH };
     }
 
     /* Couleur de base du quadrillage pour une case (pour bordure = (néant)) */
@@ -1769,6 +1919,7 @@
 
       ctx.save();
 
+      // Zones individuelles (chaque case a son opacité)
       for (const key in selectedCells) {
         const sel = selectedCells[key];
         if (!sel.fillColor) continue;
@@ -1786,22 +1937,6 @@
         ctx.globalAlpha = alpha;
         ctx.fillStyle = sel.fillColor;
         ctx.fillRect(xCell, yCell, cellW, cellH);
-      }
-
-      for (const region of mergedRegions) {
-        if (!region.fillColor || !region.cells || !region.cells.length) continue;
-        const alpha = typeof region.fillAlpha === "number" ? region.fillAlpha : 0.35;
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = region.fillColor;
-
-        for (const cell of region.cells) {
-          const c = cell.c;
-          const r = cell.r;
-          if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
-          const xCell = MARGIN_LEFT + c * cellW;
-          const yCell = MARGIN_TOP  + r * cellH;
-          ctx.fillRect(xCell, yCell, cellW, cellH);
-        }
       }
 
       ctx.restore();
@@ -2081,6 +2216,7 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
+      // Cases individuelles (bordures / textes – hors régions)
       for (const key in selectedCells) {
         const [cStr, rStr] = key.split(",");
         const c = parseInt(cStr, 10);
@@ -2144,6 +2280,7 @@
         return region.cells.some(cell => cell.c === c && cell.r === r);
       }
 
+      // Régions fusionnées (bordures / texte, mais remplissage toujours par case)
       for (const region of mergedRegions) {
         if (!region.cells || !region.cells.length) continue;
         const { cols: C2, rows: R2, cellW, cellH } = lastGridGeom;
@@ -2255,8 +2392,7 @@
       }
 
       ctx.globalAlpha = 1;
-      downloadBtn.disabled = false;
-      setMsg("Quadrillage appliqué. Tu peux télécharger ou imprimer l'image.");
+      setMsg("Quadrillage appliqué. Tu peux exporter ou imprimer l'image depuis le menu 📤.");
 
       if (sheets.length) {
         sheets[currentSheetIndex].scenario = buildScenario();
@@ -2353,8 +2489,19 @@
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
 
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
+      const xPix = (e.clientX - rect.left) * scaleX;
+      const yPix = (e.clientY - rect.top) * scaleY;
+
+      let x = xPix;
+      let y = yPix;
+
+      if (orientationMode === "landscape" && lastGridGeom) {
+        const { totalW } = lastGridGeom;
+        const xLogical = totalW - yPix;
+        const yLogical = xPix;
+        x = xLogical;
+        y = yLogical;
+      }
 
       const { cols, rows, cellW, cellH, imgW, imgH } = lastGridGeom;
 
@@ -2390,62 +2537,46 @@
 
         let effectiveBorderColor;
         if (borderChoice === "none") {
-          // (néant) = couleur du quadrillage de base (et supprime la couleur personnalisée précédente)
           effectiveBorderColor = getGridBaseColorForCell(c, r);
         } else {
           effectiveBorderColor = borderChoice;
         }
 
-        // Gestion couleur de zone
+        // Mise à jour du bloc fusionné (bordure / texte uniquement)
         if (regionHere) {
-          // REGION fusionnée
           regionHere.borderColor = effectiveBorderColor;
           regionHere.borderWidth = borderWidth;
           regionHere.text        = text;
           regionHere.textColor   = txtColor;
           regionHere.alpha       = alpha;
-
-          if (fillValue === "none") {
-            regionHere.fillColor = null;
-            regionHere.fillAlpha = null;
-          } else {
-            regionHere.fillColor = fillValue;
-            regionHere.fillAlpha = fillAlpha;
-          }
-
-          for (const cell of regionHere.cells) {
-            const k = `${cell.c},${cell.r}`;
-            const existing = selectedCells[k] || {};
-            existing.noGrid = false;
-            selectedCells[k] = existing;
-          }
-        } else {
-          const existing = selectedCells[key] || {};
-
-          let newFillColor = (typeof existing.fillColor !== "undefined") ? existing.fillColor : null;
-          let newFillAlpha = (typeof existing.fillAlpha === "number") ? existing.fillAlpha : null;
-
-          if (fillValue === "none") {
-            newFillColor = null;
-            newFillAlpha = null;
-          } else {
-            newFillColor = fillValue;
-            newFillAlpha = fillAlpha;
-          }
-
-          selectedCells[key] = {
-            ...existing,
-            borderColor: effectiveBorderColor,
-            borderWidth: borderWidth,
-            text,
-            textColor: txtColor,
-            noCode: text.length > 0,
-            noGrid: false,
-            alpha,
-            fillColor: newFillColor,
-            fillAlpha: newFillAlpha
-          };
         }
+
+        // Couleur / opacité de zone et style appliqués à la case cliquée
+        const existing = selectedCells[key] || {};
+
+        let newFillColor = (typeof existing.fillColor !== "undefined") ? existing.fillColor : null;
+        let newFillAlpha = (typeof existing.fillAlpha === "number") ? existing.fillAlpha : null;
+
+        if (fillValue === "none") {
+          newFillColor = null;
+          newFillAlpha = null;
+        } else {
+          newFillColor = fillValue;
+          newFillAlpha = fillAlpha;
+        }
+
+        selectedCells[key] = {
+          ...existing,
+          borderColor: effectiveBorderColor,
+          borderWidth: borderWidth,
+          text,
+          textColor: txtColor,
+          noCode: text.length > 0,
+          noGrid: false,
+          alpha,
+          fillColor: newFillColor,
+          fillAlpha: newFillAlpha
+        };
       } else if (selectionAction === "eraseBorder") {
         if (regionHere) {
           for (const cell of regionHere.cells) {
@@ -2542,16 +2673,15 @@
 
     function downloadPNG() {
       if (!canvas.width || !canvas.height) {
-        setMsg("Rien à télécharger : applique un quadrillage d'abord.");
+        setMsg("Rien à exporter : applique un quadrillage d'abord.");
         return;
       }
       const link = document.createElement('a');
       link.href = canvas.toDataURL("image/png");
-      link.download = "image_quadrillage.png";
+      link.download = "quadrico_carte.png";
       link.click();
+      setMsg("Image PNG enregistrée (quadrico_carte.png).");
     }
-
-    saveScenarioBtn.addEventListener('click', downloadPNG);
 
     function printWithSize(pageSize) {
       if (!canvas.width || !canvas.height) {
@@ -2559,6 +2689,7 @@
         return;
       }
 
+      const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
       const dataUrl = canvas.toDataURL("image/png");
       const printWindow = window.open("", "_blank");
       if (!printWindow) {
@@ -2571,17 +2702,21 @@
           <head>
             <title>QuadRico - Impression</title>
             <style>
-              @page { size: ${pageSize} ${printOrientation}; margin: 10mm; }
+              @page { size: ${pageSize} ${orientation}; margin: 5mm; }
               body {
                 margin: 0;
                 padding: 0;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
               }
               img {
                 max-width: 100%;
-                max-height: 95vh;
-                width: auto;
+                max-height: 100%;
                 height: auto;
+                display: block;
+                margin: 0 auto;
               }
             </style>
           </head>
@@ -2598,9 +2733,6 @@
       `);
       printWindow.document.close();
     }
-
-    printBtn.addEventListener('click', () => printWithSize("A4"));
-    printA3Btn.addEventListener('click', () => printWithSize("A3"));
 
     resetBtn.addEventListener('click', function () {
       const ok = confirm("Tu veux vraiment tout effacer et réinitialiser la grille ?");
@@ -2625,6 +2757,7 @@
       imageOpacity.value = 100;
       gridOpacity.value = 100;
       codeOpacity.value = 100;
+      fillOpacityEl.value = 35;
 
       zoomRange.value = 100;
       zoomNumber.value = 100;
@@ -2639,7 +2772,6 @@
       textColorEl.value = "";
       cellTextEl.value = "";
       fillColorEl.value = "none";
-      fillOpacityEl.value = 35;
 
       selectedCells = {};
       mergedRegions = [];
@@ -2651,8 +2783,8 @@
       imageLoader.value = "";
       img = null;
       lastGridGeom = null;
+      ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      downloadBtn.disabled = false;
 
       orientationMode = "portrait";
       updateOrientationButton();
@@ -2768,7 +2900,18 @@
     codeOpacity.addEventListener('input', autoRedrawIfEnabled);
     dashedLines.addEventListener('change', autoRedrawIfEnabled);
     fillColorEl.addEventListener('change', autoRedrawIfEnabled);
-    fillOpacityEl.addEventListener('input', autoRedrawIfEnabled);
+
+    // NOUVEAU : l’opacité de zone agit en direct sur la dernière case cliquée (si elle a une couleur de zone)
+    fillOpacityEl.addEventListener('input', () => {
+      if (!lastClickedCell) return;
+      const key = `${lastClickedCell.c},${lastClickedCell.r}`;
+      const cell = selectedCells[key];
+      if (!cell || !cell.fillColor) return;
+      cell.fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
+      if (autoRefresh.checked) {
+        autoRedrawIfEnabled();
+      }
+    });
 
     /* ==== AIDE / MODAL ==== */
 
@@ -2825,7 +2968,7 @@
       const borderWidthRadio = document.querySelector('input[name="borderWidth"]:checked');
 
       return {
-        version: "1.3",
+        version: "1.4",
         cols: colsVal,
         rows: rowsVal,
         gridType: getGridType(),
@@ -2844,7 +2987,6 @@
         textColor: textColorEl.value,
         autoRefresh: autoRefresh.checked,
         orientationMode,
-        printOrientation,
         zoom: zoomRange.value,
         fillColorDefault: fillColorEl.value,
         fillOpacity: fillOpacityEl.value,
@@ -2891,7 +3033,6 @@
       updateAutoRefreshButton();
 
       orientationMode = s.orientationMode || "portrait";
-      printOrientation = s.printOrientation || orientationMode;
       updateOrientationButton();
 
       zoomRange.value   = s.zoom || 100;
@@ -2951,19 +3092,16 @@
       }
     }
 
-    function saveScenarioJSON() {
-      const scenario = buildScenario();
+    function saveScenarioJSON(filename = "quadrico_scenario.json", scenarioOverride = null) {
+      const scenario = scenarioOverride || buildScenario();
       const blob = new Blob([JSON.stringify(scenario, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a   = document.createElement('a');
       a.href = url;
-      a.download = "quadrico_scenario.json";
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-      setMsg("Scénario sauvegardé (fichier JSON téléchargé).");
     }
-
-    downloadBtn.addEventListener('click', saveScenarioJSON);
 
     loadScenarioBtn.addEventListener('click', () => {
       scenarioFileInput.value = "";
@@ -3039,7 +3177,7 @@
       sheets.push({
         name: "Feuille " + (newIndex + 1),
         scenario: structuredClone(baseScenario),
-        imageData: null  // pas d'image copiée
+        imageData: null
       });
       currentSheetIndex = newIndex;
       refreshSheetSelect();
@@ -3123,8 +3261,6 @@
         if (region.text)       style.text        = region.text;
         if (region.textColor)  style.textColor   = region.textColor;
         if (typeof region.alpha === "number") style.alpha = region.alpha;
-        if (region.fillColor)  style.fillColor   = region.fillColor;
-        if (typeof region.fillAlpha === "number") style.fillAlpha = region.fillAlpha;
       }
 
       if (base.borderColor) style.borderColor = base.borderColor;
@@ -3158,8 +3294,6 @@
         regionHere.text        = st.text || "";
         regionHere.textColor   = st.textColor || "";
         regionHere.alpha       = (typeof st.alpha === "number") ? st.alpha : 1.0;
-        regionHere.fillColor   = st.fillColor || null;
-        regionHere.fillAlpha   = (typeof st.fillAlpha === "number") ? st.fillAlpha : null;
 
         for (const cell of regionHere.cells) {
           const k = `${cell.c},${cell.r}`;
@@ -3168,21 +3302,21 @@
           if (st.noCode) existing.noCode = true; else delete existing.noCode;
           selectedCells[k] = existing;
         }
-      } else {
-        const existing = selectedCells[key] || {};
-        selectedCells[key] = {
-          ...existing,
-          borderColor: st.borderColor || existing.borderColor,
-          borderWidth: st.borderWidth || existing.borderWidth,
-          text:        st.text,
-          textColor:   st.textColor || existing.textColor,
-          alpha:       (typeof st.alpha === "number") ? st.alpha : (existing.alpha ?? 1.0),
-          fillColor:   (st.fillColor !== null ? st.fillColor : existing.fillColor),
-          fillAlpha:   (typeof st.fillAlpha === "number" ? st.fillAlpha : existing.fillAlpha),
-          noGrid:      !!st.noGrid,
-          noCode:      !!st.noCode
-        };
       }
+
+      const existing = selectedCells[key] || {};
+      selectedCells[key] = {
+        ...existing,
+        borderColor: st.borderColor || existing.borderColor,
+        borderWidth: st.borderWidth || existing.borderWidth,
+        text:        st.text,
+        textColor:   st.textColor || existing.textColor,
+        alpha:       (typeof st.alpha === "number") ? st.alpha : (existing.alpha ?? 1.0),
+        fillColor:   (st.fillColor !== null ? st.fillColor : existing.fillColor),
+        fillAlpha:   (typeof st.fillAlpha === "number" ? st.fillAlpha : existing.fillAlpha),
+        noGrid:      !!st.noGrid,
+        noCode:      !!st.noCode
+      };
 
       drawGrid();
       setMsg("Style copié collé sur la case sélectionnée.");
@@ -3243,16 +3377,158 @@
       const addr = (mapsAddress.value || "").trim();
       let url;
       if (!addr) {
-        // Aucun texte : ouvrir Google Maps "vide"
         url = "https://www.google.com/maps/";
         setMsg("Ouverture de Google Maps.");
       } else {
-        // Adresse saisie : ouvrir la recherche sur cette adresse
         url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
         setMsg("Ouverture de Google Maps avec l'adresse saisie.");
       }
       window.open(url, "_blank");
     });
+
+    /* ==== MENU EXPORT ==== */
+
+    function closeExportMenu() {
+      exportMenu.classList.add('hidden');
+    }
+
+    function toggleExportMenu() {
+      exportMenu.classList.toggle('hidden');
+    }
+
+    exportMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleExportMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!exportMenu.contains(e.target) && e.target !== exportMenuBtn) {
+        closeExportMenu();
+      }
+    });
+
+    exportPngBtn.addEventListener('click', () => {
+      closeExportMenu();
+      downloadPNG();
+    });
+
+    function exportAsPDF() {
+      closeExportMenu();
+      if (!canvas.width || !canvas.height) {
+        setMsg("Rien à exporter : applique un quadrillage d'abord.");
+        return;
+      }
+      try {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          setMsg("Impossible de générer le PDF automatiquement dans ce navigateur.");
+          return;
+        }
+        const { jsPDF } = window.jspdf;
+        const orientation = canvas.width >= canvas.height ? 'l' : 'p';
+        const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
+
+        const pageWidth  = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgData    = canvas.toDataURL('image/png');
+
+        const imgAspect  = canvas.width / canvas.height;
+        const pageAspect = pageWidth / pageHeight;
+
+        let pdfWidth, pdfHeight;
+        if (imgAspect > pageAspect) {
+          pdfWidth  = pageWidth;
+          pdfHeight = pageWidth / imgAspect;
+        } else {
+          pdfHeight = pageHeight;
+          pdfWidth  = pageHeight * imgAspect;
+        }
+
+        const x = (pageWidth  - pdfWidth)  / 2;
+        const y = (pageHeight - pdfHeight) / 2;
+
+        pdf.addImage(imgData, 'PNG', x, y, pdfWidth, pdfHeight);
+        pdf.save('quadrico_carte.pdf');
+        setMsg("PDF exporté et téléchargé (quadrico_carte.pdf).");
+      } catch (e) {
+        console.error(e);
+        setMsg("Erreur lors de la génération du PDF.");
+      }
+    }
+
+    exportPdfBtn.addEventListener('click', exportAsPDF);
+
+    function exportGridOnlyScenario() {
+      closeExportMenu();
+      const scenario = buildScenario();
+      const scenarioCopy = structuredClone(scenario);
+      scenarioCopy.gridOnly = true;
+      scenarioCopy.imageOpacity = 0;
+      saveScenarioJSON("quadrico_quadrillage_seul.json", scenarioCopy);
+      setMsg("Quadrillage enregistré (sans la carto) au format JSON.");
+    }
+
+    exportGridOnlyBtn.addEventListener('click', exportGridOnlyScenario);
+
+    exportPrintBtn.addEventListener('click', () => {
+      closeExportMenu();
+      printWithSize("A4");
+      setMsg("Fenêtre d’impression ouverte. La carto est centrée, proportionnelle, et l’orientation suit automatiquement la forme de la carte.");
+    });
+
+    function sendExportByEmail() {
+      closeExportMenu();
+      if (!canvas.width || !canvas.height) {
+        setMsg("Rien à envoyer : applique un quadrillage d'abord.");
+        return;
+      }
+
+      const fileName = "quadrico_carte.png";
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL("image/png");
+      link.download = fileName;
+      link.click();
+
+      const subject = encodeURIComponent("QuadRico - Carte quadrillée");
+      const body = encodeURIComponent(
+        "Carte générée avec QuadRico.\n\n" +
+        "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
+        "Merci de l'ajouter en pièce jointe à ce mail avant envoi."
+      );
+      const url =
+        "https://mail.google.com/mail/?view=cm&fs=1" +
+        "&su=" + subject +
+        "&body=" + body;
+      window.open(url, "_blank");
+
+      setMsg("PNG téléchargé. Une fenêtre Gmail s'ouvre pour envoyer le mail (ajoute le fichier en pièce jointe).");
+    }
+
+    exportMailBtn.addEventListener('click', sendExportByEmail);
+
+    function sendExportByWhatsApp() {
+      closeExportMenu();
+      if (!canvas.width || !canvas.height) {
+        setMsg("Rien à envoyer : applique un quadrillage d'abord.");
+        return;
+      }
+
+      const fileName = "quadrico_carte.png";
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL("image/png");
+      link.download = fileName;
+      link.click();
+
+      const text =
+        "Carte générée avec QuadRico.\n\n" +
+        "Le fichier \"" + fileName + "\" vient d'être téléchargé sur mon appareil.\n" +
+        "Je vais l'ajouter en pièce jointe à ce message.";
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
+      window.open(url, "_blank");
+
+      setMsg("PNG téléchargé. WhatsApp s'ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
+    }
+
+    exportWhatsappBtn.addEventListener('click', sendExportByWhatsApp);
 
     /* ==== INIT ==== */
 
