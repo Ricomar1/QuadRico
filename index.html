@@ -1742,19 +1742,31 @@
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
     }
 
-    // Ouverture client mail : même logique (mailto) pour PC + téléphone
     function openEmailClient(to, subjectText, bodyText) {
-      to = to || "";
-      subjectText = subjectText || "";
-      bodyText = bodyText || "";
+  // Valeurs par défaut
+  to = to || "";
+  subjectText = subjectText || "";
+  bodyText = bodyText || "";
 
-      const params = [];
-      if (subjectText) params.push("subject=" + encodeURIComponent(subjectText));
-      if (bodyText)    params.push("body=" + encodeURIComponent(bodyText));
-      const query = params.length ? ("?" + params.join("&")) : "";
-      const mailtoUrl = "mailto:" + encodeURIComponent(to) + query;
-      window.location.href = mailtoUrl;
-    }
+  // Construction des paramètres (sujet / corps)
+  const params = [];
+  if (subjectText) params.push("subject=" + encodeURIComponent(subjectText));
+  if (bodyText)    params.push("body=" + encodeURIComponent(bodyText));
+
+  const query = params.length ? ("?" + params.join("&")) : "";
+
+  // Lien mailto classique -> laisse le système choisir Gmail, Outlook, etc.
+  const mailtoUrl = "mailto:" + to + query;
+
+  // Création d’un vrai lien cliqué par script
+  const a = document.createElement("a");
+  a.href = mailtoUrl;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 
     // Icône portrait/paysage basée sur la forme réelle du canvas
     function updateOrientationButton() {
