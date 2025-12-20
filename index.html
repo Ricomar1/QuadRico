@@ -870,11 +870,6 @@
       z-index: 1100;
     }
 
-    .shortcut-key {
-      color: #60a5fa;
-      font-weight: 600;
-    }
-
     .zone-color-group-line label {
       width: 100%;
       display: flex;
@@ -975,7 +970,7 @@
 
       .mobile-portrait .toolbar-main #optionsToggle { order: 5; }
 
-      /* CENTRAGE DES BLOCS SOURCE / FEUILLES / GRILLE / LÉGENDE */
+      /* CENTRAGE + LARGEUR DES BLOCS SOURCE / FEUILLES / GRILLE / LÉGENDE */
       .source-zoom-row {
         flex-direction: column;
         align-items: center;
@@ -987,7 +982,8 @@
       .source-zoom-row > .mid-box,
       .source-zoom-row > .zoom-box {
         width: 100%;
-        max-width: 420px;
+        max-width: 100%;
+        min-width: 0;
         margin: 0 auto;
       }
 
@@ -1008,6 +1004,27 @@
         transform: translateX(-50%);
         right: auto;
         width: min(260px, 90vw);
+      }
+
+      /* Disposition spéciale des boutons Sélection de case sur téléphone */
+      .selection-modes,
+      .selection-modes-second {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+      }
+      #modeApply {
+        flex: 0 1 100%;
+      }
+      #modeEraseBorder,
+      #modeEraseCode {
+        flex: 0 1 calc(50% - 4px);
+      }
+      #modeMerge,
+      #modeSplit,
+      #modeReset {
+        flex: 0 1 calc(33.33% - 4px);
       }
     }
 
@@ -1299,15 +1316,11 @@
             </div>
           </div>
 
-          <!-- Ligne 1 : APPLIQUER -->
-          <div class="selection-modes selection-row-1">
+          <!-- BOUTONS SÉLECTION DE CASE : 2 LIGNES (PC), 3 LIGNES (TEL via CSS) -->
+          <div class="selection-modes">
             <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
               <span class="icon">✎</span> Appliquer
             </button>
-          </div>
-
-          <!-- Ligne 2 : Effacer bordure + Effacer texte/croix -->
-          <div class="selection-modes selection-row-2">
             <button id="modeEraseBorder" class="selection-mode-btn" type="button" title="Effacer bordure / quadrillage">
               <span class="icon">⬚</span> Effacer bordure
             </button>
@@ -1315,9 +1328,7 @@
               <span class="icon">✕</span> Effacer texte/croix
             </button>
           </div>
-
-          <!-- Ligne 3 : Fusionner + Fractionner + Réinitialiser -->
-          <div class="selection-modes-second selection-row-3">
+          <div class="selection-modes-second">
             <button id="modeMerge" class="selection-mode-btn" type="button" title="Fusionner les cases">
               <span class="icon">▩</span> Fusionner
             </button>
@@ -1529,13 +1540,13 @@
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
               <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée et une orientation de page adaptée à la forme de la carte.</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application de messagerie (lien mailto) avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application de messagerie / client mail par défaut avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
               <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre ton application de messagerie vers le concepteur (lien mailto).</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre ton application de messagerie / client mail par défaut vers le concepteur.</li>
         </ul>
       </details>
 
@@ -1726,6 +1737,25 @@
 
     updateThemeButton();
 
+    // Détection mobile (utile si besoin plus tard)
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
+    }
+
+    // Ouverture client mail : même logique (mailto) pour PC + téléphone
+    function openEmailClient(to, subjectText, bodyText) {
+      to = to || "";
+      subjectText = subjectText || "";
+      bodyText = bodyText || "";
+
+      const params = [];
+      if (subjectText) params.push("subject=" + encodeURIComponent(subjectText));
+      if (bodyText)    params.push("body=" + encodeURIComponent(bodyText));
+      const query = params.length ? ("?" + params.join("&")) : "";
+      const mailtoUrl = "mailto:" + encodeURIComponent(to) + query;
+      window.location.href = mailtoUrl;
+    }
+
     // Icône portrait/paysage basée sur la forme réelle du canvas
     function updateOrientationButton() {
       const iconSpan = orientationToggle.querySelector('.orient-icon');
@@ -1785,9 +1815,9 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact (mailto pour PC + téléphone)
+    // Bouton de contact (mailto pour PC + tél)
     contactBtn.addEventListener('mouseenter', () => {
-      setIconHint("Envoyer un mail au concepteur de QuadRico (ouvre ton appli de messagerie).");
+      setIconHint("Envoyer un mail au concepteur de QuadRico (appli mail / client par défaut).");
       contactInfo.textContent =
         "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
     });
@@ -1800,11 +1830,7 @@
       const subjectText = "QuadRico - remarques / améliorations";
       const bodyText =
         "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n";
-      const mailtoUrl =
-        "mailto:" + encodeURIComponent(to) +
-        "?subject=" + encodeURIComponent(subjectText) +
-        "&body=" + encodeURIComponent(bodyText);
-      window.location.href = mailtoUrl;
+      openEmailClient(to, subjectText, bodyText);
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -2653,11 +2679,11 @@
 
       pushHistory();
 
-      const fillValue = fillColorEl.value; // "none" ou couleur rgba(...)
+      const fillValue = fillColorEl.value;
       const fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
 
       if (selectionAction === "apply") {
-        const borderChoice = borderColorEl.value; // "none" ou couleur
+        const borderChoice = borderColorEl.value;
         const borderWidth = getBorderWidthPx();
         const text = cellTextEl.value.trim();
         const txtColor = textColorEl.value || "";
@@ -2670,7 +2696,6 @@
           effectiveBorderColor = borderChoice;
         }
 
-        // Mise à jour du bloc fusionné (bordure / texte uniquement)
         if (regionHere) {
           regionHere.borderColor = effectiveBorderColor;
           regionHere.borderWidth = borderWidth;
@@ -2679,7 +2704,6 @@
           regionHere.alpha       = alpha;
         }
 
-        // Couleur / opacité de zone et style appliqués à la case cliquée
         const existing = selectedCells[key] || {};
 
         let newFillColor = (typeof existing.fillColor !== "undefined") ? existing.fillColor : null;
@@ -3306,7 +3330,6 @@
       }
     });
 
-    // ⧉ : dupliquer la feuille actuellement affichée
     duplicateSheet1Btn.addEventListener('click', () => {
       if (!sheets.length || !sheets[currentSheetIndex].scenario) {
         setMsg("La feuille actuelle n'a pas encore de scénario à copier (applique un quadrillage d'abord).");
@@ -3606,14 +3629,9 @@
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
         "Merci de l'ajouter en pièce jointe au mail avant envoi.\n";
 
-      const mailtoUrl =
-        "mailto:" +
-        "?subject=" + encodeURIComponent(subjectText) +
-        "&body=" + encodeURIComponent(bodyText);
+      openEmailClient("", subjectText, bodyText);
 
-      window.location.href = mailtoUrl;
-
-      setMsg("PNG téléchargé. Ton application de messagerie s'ouvre (ajoute le fichier en pièce jointe).");
+      setMsg("PNG téléchargé. Ta messagerie / ton client mail par défaut s'ouvre : ajoute le fichier en pièce jointe.");
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
