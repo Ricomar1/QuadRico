@@ -86,11 +86,7 @@
     .logo-green  { background: #4adf7c; }
     .logo-red    { background: #ff5f5f; }
 
-    .logo-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
     .logo-text-main {
       font-weight: 600;
       font-size: 22px;
@@ -134,13 +130,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 20px;
       border-radius: 999px;
       border: 1px solid #2c3345;
       background: var(--btn-bg);
       color: var(--text-main);
       cursor: pointer;
       box-shadow: 0 0 8px rgba(0,0,0,0.45);
+      line-height: 1;
     }
 
     :root[data-theme="light"] .top-icon-btn {
@@ -216,9 +213,7 @@
       background: var(--accent-soft);
     }
 
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
 
     /* Ligne Source + mid-box + Zoom */
     .source-zoom-row {
@@ -433,13 +428,37 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
 
-    /* Portrait / Paysage dans la toolbar */
-    #orientationToggle {
-      border-color: var(--accent);
+    /* Portrait / Paysage icône rectangle + flèche */
+    #orientationToggle { border-color: var(--accent); }
+    :root[data-theme="light"] #orientationToggle { border-color: var(--accent); }
+
+    #orientationToggle .orient-icon {
+      display: inline-block;
+      width: 20px;
+      height: 16px;
+      border-radius: 3px;
+      border: 2px solid currentColor;
+      position: relative;
+      box-sizing: border-box;
     }
 
-    :root[data-theme="light"] #orientationToggle {
-      border-color: var(--accent);
+    #orientationToggle .orient-icon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #orientationToggle .orient-portrait::before {
+      content: "↕";
+    }
+
+    #orientationToggle .orient-landscape::before {
+      content: "↔";
     }
 
     /* Reset dans la toolbar */
@@ -521,13 +540,8 @@
       z-index: 400;
     }
 
-    /* Mode briefing */
-    body.briefing-mode .side-panel {
-      display: none;
-    }
-    body.briefing-mode .canvas-wrapper {
-      flex: 1 1 auto;
-    }
+    body.briefing-mode .side-panel { display: none; }
+    body.briefing-mode .canvas-wrapper { flex: 1 1 auto; }
 
     /* BLOC OPTIONS */
     .controls {
@@ -598,14 +612,13 @@
       color: #111827;
     }
 
-    /* TEXTE : NOIR EN CLAIR, BLANC EN SOMBRE */
     input[type="text"] {
       margin-left: 4px;
       padding: 2px 4px;
       border-radius: 6px;
       border: 1px solid #32394b;
       background: #090c14;
-      color: var(--text-main); /* <- BLANC EN MODE SOMBRE */
+      color: var(--text-main);
       width: 130px;
     }
 
@@ -634,21 +647,20 @@
     .group strong {
       font-size: 13px;
       color: var(--accent);
-      margin-bottom: 1px;
+      margin-bottom: 4px;
       white-space: nowrap;
+      text-align: center;
     }
 
-    .group-full {
-      grid-column: 1 / -1;
-    }
+    .group-full { grid-column: 1 / -1; }
 
     .selection-modes,
     .selection-modes-second {
       display: flex;
       gap: 6px;
       margin-top: 4px;
-      flex-wrap: nowrap;
-      justify-content: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .selection-mode-btn {
@@ -678,7 +690,9 @@
     }
 
     .selection-mode-btn span.icon {
-      font-size: 14px;
+      font-size: 16px;
+      width: 18px;
+      text-align: center;
     }
 
     .border-width-options {
@@ -705,9 +719,7 @@
       max-width: 100%;
     }
 
-    :root[data-theme="light"] canvas {
-      border-color: #cbd5e1;
-    }
+    :root[data-theme="light"] canvas { border-color: #cbd5e1; }
 
     #msg {
       margin-top: 8px;
@@ -715,9 +727,7 @@
       color: #ffb74d;
     }
 
-    :root[data-theme="light"] #msg {
-      color: #b45309;
-    }
+    :root[data-theme="light"] #msg { color: #b45309; }
 
     footer {
       margin-top: 16px;
@@ -738,9 +748,7 @@
       z-index: 1000;
     }
 
-    .help-overlay.hidden {
-      display: none !important;
-    }
+    .help-overlay.hidden { display: none !important; }
 
     .help-modal {
       position: relative;
@@ -790,13 +798,9 @@
       right: 8px;
     }
 
-    .help-close:hover {
-      color: var(--text-main);
-    }
+    .help-close:hover { color: var(--text-main); }
 
-    details {
-      margin-top: 6px;
-    }
+    details { margin-top: 6px; }
 
     details > summary {
       cursor: pointer;
@@ -805,33 +809,87 @@
       list-style: none;
     }
 
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
+    details > summary::-webkit-details-marker { display: none; }
 
     details > summary::before {
       content: "▸ ";
       font-size: 12px;
     }
 
-    details[open] > summary::before {
-      content: "▾ ";
+    details[open] > summary::before { content: "▾ "; }
+
+    /* Infobulle Sélection de case (icône ?) */
+    .zone-help-wrapper {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      margin: 2px 0 6px;
+    }
+
+    .case-help-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid var(--border-panel);
+      font-size: 16px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0,0,0,0.45);
+    }
+
+    :root[data-theme="dark"] .case-help-btn {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    :root[data-theme="light"] .case-help-btn {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .help-tooltip-inline {
+      position: absolute;
+      top: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: var(--text-sub);
+      width: 360px;
+      max-width: 95vw;
+      max-height: 60vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      z-index: 1100;
+    }
+
+    .shortcut-key {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .zone-color-group-line label {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
     }
 
     /* ===================== RESPONSIVE TÉLÉPHONE ===================== */
 
     @media (max-width: 900px) {
-      body {
-        margin: 10px;
-      }
+      body { margin: 10px; }
 
-      .main-layout {
-        flex-direction: column;
-      }
+      .main-layout { flex-direction: column; }
 
-      .canvas-wrapper {
-        width: 100%;
-      }
+      .canvas-wrapper { width: 100%; }
 
       .side-panel {
         position: static;
@@ -842,13 +900,9 @@
         justify-content: center;
       }
 
-      body.options-collapsed .side-panel {
-        display: none;
-      }
+      body.options-collapsed .side-panel { display: none; }
 
-      .zoom-box {
-        display: none;
-      }
+      .zoom-box { display: none; }
 
       .controls {
         grid-template-columns: 1fr;
@@ -864,7 +918,7 @@
         flex-wrap: wrap;
       }
 
-      /* MODE MOBILE PAYSAGE : on garde le comportement actuel */
+      /* MODE MOBILE PAYSAGE */
       .mobile-landscape .toolbar-main #undoBtn,
       .mobile-landscape .toolbar-main #redoBtn,
       .mobile-landscape .toolbar-main #undoDeleteBtn,
@@ -882,75 +936,88 @@
         justify-content: center;
       }
 
-      /* MODE MOBILE PORTRAIT :
-         Ligne 1 : ↩ ↪ SUPPRIMER
-         Ligne 2 : Portrait/Paysage, Corbeille, AUTO
-         Ligne 3 : Options, APPLIQUER
+      /* MODE MOBILE PORTRAIT
+         L1 : portrait + corbeille
+         L2 : ↩ + ↪
+         L3 : SUPPRIMER + AUTO
+         L4 : APPLIQUER
+         L5 : OPTIONS
       */
+      .mobile-portrait .toolbar-main #orientationToggle,
+      .mobile-portrait .toolbar-main #resetBtn,
       .mobile-portrait .toolbar-main #undoBtn,
       .mobile-portrait .toolbar-main #redoBtn,
       .mobile-portrait .toolbar-main #undoDeleteBtn,
-      .mobile-portrait .toolbar-main #orientationToggle,
-      .mobile-portrait .toolbar-main #resetBtn,
       .mobile-portrait .toolbar-main #autoRefreshBtn {
-        flex: 1 1 calc(33.33% - 6px);
-        max-width: none;
-      }
-
-      .mobile-portrait .toolbar-main #optionsToggle,
-      .mobile-portrait .toolbar-main #drawBtn {
         flex: 1 1 calc(50% - 6px);
         max-width: none;
       }
 
-      .mobile-portrait .toolbar-main #undoBtn,
-      .mobile-portrait .toolbar-main #redoBtn,
-      .mobile-portrait .toolbar-main #undoDeleteBtn {
-        order: 1;
+      .mobile-portrait .toolbar-main #drawBtn,
+      .mobile-portrait .toolbar-main #optionsToggle {
+        flex: 1 1 100%;
+        max-width: none;
       }
 
       .mobile-portrait .toolbar-main #orientationToggle,
-      .mobile-portrait .toolbar-main #resetBtn,
-      .mobile-portrait .toolbar-main #autoRefreshBtn {
-        order: 2;
-      }
+      .mobile-portrait .toolbar-main #resetBtn { order: 1; }
 
-      .mobile-portrait .toolbar-main #optionsToggle,
-      .mobile-portrait .toolbar-main #drawBtn {
-        order: 3;
-      }
+      .mobile-portrait .toolbar-main #undoBtn,
+      .mobile-portrait .toolbar-main #redoBtn { order: 2; }
 
+      .mobile-portrait .toolbar-main #undoDeleteBtn,
+      .mobile-portrait .toolbar-main #autoRefreshBtn { order: 3; }
+
+      .mobile-portrait .toolbar-main #drawBtn { order: 4; }
+
+      .mobile-portrait .toolbar-main #optionsToggle { order: 5; }
+
+      /* CENTRAGE DES BLOCS SOURCE / FEUILLES / PARAMÈTRES / LÉGENDE */
       .source-zoom-row {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
       }
-      .source-box,
-      .mid-box {
+      .source-zoom-row > .source-box,
+      .source-zoom-row > .mid-box,
+      .source-zoom-row > .zoom-box {
         width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
       }
 
-      .system-icons {
-        justify-content: center;
-      }
+      .system-icons { justify-content: center; }
 
-      #optionsToggle {
-        display: inline-flex;
-      }
+      #optionsToggle { display: inline-flex; }
 
-      label {
-        font-size: 12px;
-      }
-      .group {
-        font-size: 12px;
-      }
+      label { font-size: 12px; }
+      .group { font-size: 12px; }
 
-      canvas {
-        height: auto;
-      }
+      canvas { height: auto; }
 
+      /* MENU EXPORT CENTRÉ ÉCRAN SUR TÉLÉPHONE */
       .export-menu {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
         right: auto;
-        left: 0;
+        width: min(260px, 90vw);
+      }
+    }
+
+    /* Uniformisation hauteur des cadres + titres alignés (desktop) */
+    @media (min-width: 901px) {
+      .source-zoom-row { align-items: stretch; }
+      .source-zoom-row > .source-box,
+      .source-zoom-row > .mid-box,
+      .source-zoom-row > .zoom-box {
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+      .source-zoom-row > .source-box > strong,
+      .source-zoom-row > .mid-box > strong,
+      .source-zoom-row > .zoom-box > strong {
+        align-self: start;
       }
     }
   </style>
@@ -978,7 +1045,6 @@
       <button id="themeToggle" class="top-icon-btn" aria-label="Basculer mode jour/sombre">
         <span class="theme-toggle-icon">☯</span>
       </button>
-      <!-- Portrait / Paysage déplacé dans la toolbar -->
       <button id="fullscreenToggle" class="top-icon-btn" aria-label="Basculer plein écran">
         ⛶
       </button>
@@ -991,7 +1057,7 @@
         ❓
       </button>
 
-      <!-- MENU EXPORT / IMPRESSION (déplacé après le guide) -->
+      <!-- MENU EXPORT / IMPRESSION -->
       <div class="export-menu-wrapper">
         <button id="exportMenuBtn" class="top-icon-btn export" aria-label="Exporter / imprimer">
           📤
@@ -1081,16 +1147,12 @@
       <div class="mid-box">
         <strong>Légende</strong>
         <label>
-          <span>Pas de légende</span>
-          <input type="radio" name="legendMode" value="none">
-        </label>
-        <label>
-          <span>Légende partielle</span>
-          <input type="radio" name="legendMode" value="partial">
-        </label>
-        <label>
-          <span>Légende totale (4 côtés)</span>
-          <input type="radio" name="legendMode" value="full" checked>
+          <span>Mode de légende :</span>
+          <select id="legendModeSelect">
+            <option value="none">Pas de légende</option>
+            <option value="partial">Légende partielle (2 côtés)</option>
+            <option value="full" selected>Légende totale (4 côtés)</option>
+          </select>
         </label>
       </div>
 
@@ -1121,17 +1183,17 @@
         <button id="undoDeleteBtn">
           SUPPRIMER
         </button>
-        <button id="drawBtn">
-          APPLIQUER
-        </button>
         <button id="autoRefreshBtn" class="undo-redo-btn" title="Rafraîchissement auto">
           AUTO
         </button>
         <button id="orientationToggle" class="undo-redo-btn" aria-label="Portrait / Paysage (affichage)">
-          🖼️↕
+          <span class="orient-icon orient-portrait"></span>
         </button>
         <button id="resetBtn" class="undo-redo-btn" aria-label="Effacer / Reset">
           🗑
+        </button>
+        <button id="drawBtn">
+          APPLIQUER
         </button>
         <button id="optionsToggle" class="undo-redo-btn" aria-label="Afficher / masquer les options">
           ⚙
@@ -1150,47 +1212,27 @@
     <div class="side-panel">
       <div class="controls">
         <div class="group">
-          <strong>Choix du type de quadrillage :</strong>
-          <label>
-            <span>Aucun</span>
-            <input type="radio" name="gridType" value="none">
-          </label>
-          <label>
-            <span>Noir</span>
-            <input type="radio" name="gridType" value="uni-black">
-          </label>
-          <label>
-            <span>Rouge</span>
-            <input type="radio" name="gridType" value="uni-red">
-          </label>
-          <label>
-            <span>FSI (4 couleurs)</span>
-            <input type="radio" name="gridType" value="fsi" checked>
-          </label>
+          <strong>Choix du type de quadrillage</strong>
+          <select id="gridTypeSelect">
+            <option value="none">Aucun</option>
+            <option value="uni-black">Noir</option>
+            <option value="uni-red">Rouge</option>
+            <option value="fsi" selected>FSI (4 couleurs)</option>
+          </select>
         </div>
 
         <div class="group">
-          <strong>Choix du type de code dans les cases :</strong>
-          <label>
-            <span>Aucun code</span>
-            <input type="radio" name="labelMode" value="none" checked>
-          </label>
-          <label>
-            <span>Code noir</span>
-            <input type="radio" name="labelMode" value="uni">
-          </label>
-          <label>
-            <span>Code rouge</span>
-            <input type="radio" name="labelMode" value="color">
-          </label>
-          <label>
-            <span>Code FSI</span>
-            <input type="radio" name="labelMode" value="fsi-color">
-          </label>
+          <strong>Choix du type de code dans les cases</strong>
+          <select id="labelModeSelect">
+            <option value="none" selected>Aucun code</option>
+            <option value="uni">Code noir</option>
+            <option value="color">Code rouge</option>
+            <option value="fsi-color">Code FSI</option>
+          </select>
         </div>
 
         <div class="group">
-          <strong>Style des lignes :</strong>
+          <strong>Style des lignes</strong>
           <label>
             <span>Pointillés</span>
             <input type="checkbox" id="dashedLines">
@@ -1210,7 +1252,7 @@
         </div>
 
         <div class="group">
-          <strong>Opacité :</strong>
+          <strong>Opacité</strong>
           <label>
             <span>Image :</span>
             <input type="range" id="imageOpacity" min="0" max="100" value="100">
@@ -1230,7 +1272,26 @@
         </div>
 
         <div class="group group-full">
-          <strong>Sélection de case :</strong>
+          <strong>Sélection de case</strong>
+
+          <!-- ICÔNE "?" + TEXTE RÉSUMÉ (version raccourcie) -->
+          <div id="zoneHelpWrapper" class="zone-help-wrapper">
+            <button id="fillHelpIcon" type="button" class="case-help-btn">?</button>
+            <div id="fillHelpTooltip" class="help-tooltip-inline hidden">
+              <strong>Utilisation rapide</strong><br>
+              • Choisis un mode : <em>Appliquer</em>, <em>Effacer bordure</em>, <em>Effacer texte/croix</em>, <em>Fusionner</em>, <em>Fractionner</em> ou <em>Réinitialiser</em>.<br>
+              • Clique ensuite directement sur la case à modifier.<br><br>
+
+              <strong>Zones colorées</strong><br>
+              • <em>Couleur de zone</em> = couleur appliquée sur la case (surface colorée).<br>
+              • <em>(néant)</em> = aucune zone colorée (ou suppression de la zone existante).<br>
+              • L’intensité est réglée avec le curseur <strong>« Zone colorée »</strong> (rubrique Opacité) au moment où tu appliques.<br><br>
+
+              <strong>Texte, codes & croix</strong><br>
+              • Si tu saisis un <strong>texte</strong> dans la case, les <strong>codes automatiques</strong> (A1, B3, …) et les <strong>croix</strong> sont désactivés pour cette case.<br>
+              • Pour revenir au quadrillage d’origine sur une bordure personnalisée, mets <strong>Couleur de bordure = (néant)</strong> puis clique sur la case concernée.
+            </div>
+          </div>
 
           <div class="selection-modes">
             <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
@@ -1308,34 +1369,23 @@
               <option value="#ffffff">Blanc</option>
             </select>
           </label>
-          <label>
-            <span>Couleur de zone :</span>
-            <select id="fillColor">
-              <option value="none">(néant)</option>
-              <option value="rgba(255,0,0,0.6)">Rouge</option>
-              <option value="rgba(0,128,0,0.6)">Vert</option>
-              <option value="rgba(0,0,255,0.6)">Bleu</option>
-              <option value="rgba(255,255,0,0.6)">Jaune</option>
-              <option value="rgba(255,165,0,0.6)">Orange</option>
-              <option value="rgba(128,0,128,0.6)">Violet</option>
-              <option value="rgba(255,255,255,0.6)">Blanc</option>
-              <option value="rgba(0,0,0,0.6)">Noir</option>
-            </select>
-          </label>
 
-          <small style="font-size:11px;color:var(--text-sub); white-space:normal;">
-            Clique directement sur une case pour appliquer l'action choisie.<br>
-            Si un texte est défini, croix et codes sont désactivés pour cette case.<br>
-            L’opacité de la zone colorée dépend du curseur « Zone colorée » (section <strong>Opacité</strong>) au moment où tu valides.<br>
-            Pour modifier l’opacité d’une case déjà colorée : reclique sur la case puis ajuste le curseur « Zone colorée ».  
-            Si <strong>AUTO</strong> est activé, la case se met à jour en direct ; sinon, clique de nouveau sur <strong>APPLIQUER</strong>.<br>
-            Utilise ↩ / ↪ ou <strong>Ctrl + Z</strong> pour revenir en arrière.<br>
-            Utilise <strong>Ctrl + C / Ctrl + V</strong> pour copier / coller le style de la dernière case cliquée.<br>
-            Touche <strong>Entrée</strong> = bouton <strong>APPLIQUER</strong>.<br>
-            Touche <strong>Suppr (Delete)</strong> = réinitialiser la dernière case cliquée.<br>
-            Pour supprimer une zone colorée : mets <strong>Couleur de zone = (néant)</strong> puis clique sur la case.<br>
-            Pour revenir à la couleur du quadrillage : mets <strong>Couleur de bordure = (néant)</strong> puis clique sur la case.
-          </small>
+          <div class="zone-color-group-line">
+            <label>
+              <span>Couleur de zone :</span>
+              <select id="fillColor">
+                <option value="none">(néant)</option>
+                <option value="rgba(255,0,0,0.6)">Rouge</option>
+                <option value="rgba(0,128,0,0.6)">Vert</option>
+                <option value="rgba(0,0,255,0.6)">Bleu</option>
+                <option value="rgba(255,255,0,0.6)">Jaune</option>
+                <option value="rgba(255,165,0,0.6)">Orange</option>
+                <option value="rgba(128,0,128,0.6)">Violet</option>
+                <option value="rgba(255,255,255,0.6)">Blanc</option>
+                <option value="rgba(0,0,0,0.6)">Noir</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -1356,7 +1406,7 @@
         <li>fusionner / fractionner / réinitialiser une case.</li>
       </ul>
       <p><strong>Raccourcis principaux :</strong>  
-        Entrée (APPLIQUER), Ctrl + Z (annuler), Ctrl + C / Ctrl + V (copier / coller le style),  
+        Entrée (APPLIQUER), Ctrl + Z, Ctrl + C / Ctrl + V,  
         Ctrl + molette (zoom), Suppr (Delete) = réinitialiser la dernière case cliquée.
       </p>
       <p>Pour l’export, utilise le bouton <strong>📤</strong> (PNG, PDF, quadrillage seul, impression, mail, WhatsApp, scénario).  
@@ -1376,8 +1426,8 @@
           <li><strong>Image</strong> : importe une photo (satellite, plan, croquis, etc.).</li>
           <li><strong>Adresse Google Maps</strong> : saisis une adresse ou un lieu puis 🔍 pour ouvrir dans un nouvel onglet.</li>
           <li><strong>Grille sans image</strong> : quadrillage seul (fond noir / blanc selon le thème).</li>
-          <li><strong>Bouton 🖼️↕ / 🖼️↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage) pour adapter la vue.  
-              L’orientation d’<strong>impression</strong>, elle, reste automatisée en fonction de la forme de la carte.</li>
+          <li><strong>Bouton ▯↕ / ▭↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage) pour adapter la vue.  
+              L’orientation d’impression est ensuite adaptée automatiquement à la forme de la carte.</li>
         </ul>
       </details>
 
@@ -1385,8 +1435,8 @@
         <summary>2. Quadrillage & légende</summary>
         <ul>
           <li><strong>Colonnes / Lignes</strong> : taille de la grille (A1, B3, …).</li>
-          <li><strong>Quadrillage</strong> : aucun / noir / rouge / FSI.</li>
-          <li><strong>Légende</strong> : pas de légende / partielle / totale (4 côtés).</li>
+          <li><strong>Quadrillage</strong> : aucun / noir / rouge / FSI (menu déroulant).</li>
+          <li><strong>Légende</strong> : pas de légende / partielle (2 côtés) / totale (4 côtés) (menu déroulant).</li>
           <li><strong>Rafraîchissement auto (AUTO)</strong> : si activé, la carte se met à jour dès que tu modifies un paramètre général (grille, opacité, etc.).</li>
           <li>Les colonnes suivent la logique <strong>A, B, …, Z, AA, AB, …</strong>.</li>
         </ul>
@@ -1395,21 +1445,13 @@
       <details>
         <summary>3. Codes, croix & zones colorées</summary>
         <ul>
-          <li><strong>Type de code</strong> : aucun / noir / rouge / FSI.</li>
+          <li><strong>Type de code</strong> (menu déroulant) : aucun / noir / rouge / FSI.</li>
           <li><strong>Croix</strong> : noir, rouge ou FSI (une seule couleur à la fois).</li>
           <li><strong>Couleur de zone</strong> :
             <ul>
               <li><em>(néant)</em> : aucune zone colorée pour la case (ou suppression de la zone existante).</li>
               <li>Couleur (rouge, vert, …) : zone colorée semi-transparente.</li>
-            </ul>
-          </li>
-          <li><strong>Opacité de zone</strong> :
-            <ul>
-              <li>Réglée par le curseur « Zone colorée » dans la section <strong>Opacité</strong>.</li>
-              <li>Lors de la création : la valeur du curseur au moment où tu cliques sur <strong>APPLIQUER</strong> est mémorisée pour la case.</li>
-              <li>Pour modifier l’opacité d’une case déjà colorée : reclique sur la case, puis ajuste le curseur.  
-                  Si <strong>AUTO</strong> est activé, l’opacité change en direct ; sinon, clique à nouveau sur <strong>APPLIQUER</strong>.</li>
-              <li>Chaque case garde sa propre opacité, indépendamment des autres.</li>
+              <li>L’opacité est réglée par le curseur <strong>« Zone colorée »</strong> dans la rubrique <strong>Opacité</strong>.</li>
             </ul>
           </li>
         </ul>
@@ -1438,9 +1480,9 @@
       <details>
         <summary>5. Travail par case</summary>
         <ul>
-          <li>Clique directement sur une case pour appliquer l'action :</li>
-          <li><strong>Appliquer</strong> : bordure + texte + zone colorée selon les réglages, avec l’opacité choisie.</li>
-          <li><strong>Effacer bordure</strong> : supprime le trait (ou le trait du bloc fusionné).</li>
+          <li>Clique sur une case pour appliquer le mode choisi :</li>
+          <li><strong>Appliquer</strong> : bordure + texte + zone colorée selon les réglages.</li>
+          <li><strong>Effacer bordure</strong> : supprime le trait (ou le trait du bloc fusionné) et la personnalisation de la bordure.</li>
           <li><strong>Effacer texte/croix</strong> : supprime texte, codes et croix.</li>
           <li><strong>Fusionner / Fractionner</strong> : créer ou casser des blocs multi-cases (uniquement pour la bordure et le texte).  
               La <strong>couleur de zone et son opacité</strong> restent gérées case par case, même si les cases sont fusionnées.</li>
@@ -1465,8 +1507,8 @@
         <summary>7. Export, impression & briefing (icônes de contrôle)</summary>
         <ul>
           <li><strong>☯</strong> : mode sombre / clair.</li>
-          <li><strong>🖼️↕ / 🖼️↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage).  
-              L’orientation papier est choisie automatiquement au moment de l’<strong>impression</strong> ou du <strong>PDF</strong> selon la forme de la carte visible.</li>
+          <li><strong>▯↕ / ▭↔</strong> : fait pivoter l’affichage de la carte (portrait / paysage).  
+              L’orientation papier est ensuite adaptée automatiquement à la forme de la carte.</li>
           <li><strong>⛶</strong> : plein écran.</li>
           <li><strong>🎬</strong> : mode briefing (affiche uniquement la carte).</li>
           <li><strong>📤 Export / Imprimer</strong> (menu déroulant) :
@@ -1474,14 +1516,14 @@
               <li><strong>Enregistrer l'image en PNG</strong> : exporte la carte quadrillée en image.</li>
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
-              <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée, proportionnelle et orientation <strong>auto</strong> (portrait si la carte est verticale, paysage si elle est horizontale).</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application mail (via <em>mailto:</em>). Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
-              <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli. Ajoute manuellement le fichier téléchargé en pièce jointe.</li>
+              <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée et une orientation de page adaptée à la forme de la carte.</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail Web avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
+              <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre ton application mail avec destinataire, objet et message de base pré-remplis pour contacter le concepteur.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre un mail de contact vers le concepteur dans Gmail Web.</li>
         </ul>
       </details>
 
@@ -1545,6 +1587,10 @@
     const cellTextEl    = document.getElementById('cellText');
     const fillColorEl   = document.getElementById('fillColor');
 
+    const gridTypeSelect   = document.getElementById('gridTypeSelect');
+    const labelModeSelect  = document.getElementById('labelModeSelect');
+    const legendModeSelect = document.getElementById('legendModeSelect');
+
     const themeToggle   = document.getElementById('themeToggle');
     const orientationToggle = document.getElementById('orientationToggle');
     const fullscreenToggle  = document.getElementById('fullscreenToggle');
@@ -1588,6 +1634,10 @@
     const exportMailBtn      = document.getElementById('exportMailBtn');
     const exportWhatsappBtn  = document.getElementById('exportWhatsappBtn');
 
+    const fillHelpIcon       = document.getElementById('fillHelpIcon');
+    const fillHelpTooltip    = document.getElementById('fillHelpTooltip');
+    const zoneHelpWrapper    = document.getElementById('zoneHelpWrapper');
+
     let selectionAction = "apply";
 
     let img = null;
@@ -1605,7 +1655,7 @@
     let history = [];
     let historyIndex = -1;
 
-    let orientationMode = "portrait"; // affichage (rotation 0° / 90°)
+    let orientationMode = "portrait"; // rotation interne (0° / 90°)
     let briefingMode = false;
 
     let baseCanvasWidth = 0;
@@ -1634,8 +1684,7 @@
     }
 
     function getLegendMode() {
-      const r = document.querySelector('input[name="legendMode"]:checked');
-      return r ? r.value : "full";
+      return legendModeSelect.value || "full";
     }
 
     function handleCrossChange(changed) {
@@ -1665,27 +1714,35 @@
 
     updateThemeButton();
 
+    // Icône portrait/paysage basée sur la forme réelle du canvas
     function updateOrientationButton() {
-      if (orientationMode === "portrait") {
-        orientationToggle.textContent = "🖼️↕";
-        orientationToggle.title = "Mode portrait (affichage)";
+      const iconSpan = orientationToggle.querySelector('.orient-icon');
+      if (!iconSpan) return;
+
+      let isLandscape = true;
+      if (canvas.width && canvas.height) {
+        isLandscape = canvas.width >= canvas.height;
+      }
+
+      if (isLandscape) {
+        iconSpan.classList.remove('orient-portrait');
+        iconSpan.classList.add('orient-landscape');
+        orientationToggle.title = "Affichage actuel : paysage (clique pour passer en portrait)";
       } else {
-        orientationToggle.textContent = "🖼️↔";
-        orientationToggle.title = "Mode paysage (affichage)";
+        iconSpan.classList.remove('orient-landscape');
+        iconSpan.classList.add('orient-portrait');
+        orientationToggle.title = "Affichage actuel : portrait (clique pour passer en paysage)";
       }
     }
 
     orientationToggle.addEventListener('click', () => {
       orientationMode = (orientationMode === "portrait") ? "landscape" : "portrait";
-      updateOrientationButton();
       if (img || gridOnly.checked) {
         drawGrid();
       } else {
         setMsg("Choisis une image ou active \"Grille sans image\" puis clique sur APPLIQUER.");
       }
     });
-
-    updateOrientationButton();
 
     fullscreenToggle.addEventListener('click', () => {
       if (!document.fullscreenElement) {
@@ -1716,7 +1773,7 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact : texte complet seulement au survol + MAILTO au clic
+    // Bouton de contact (passe sur Gmail Web)
     contactBtn.addEventListener('mouseenter', () => {
       setIconHint("Envoyer un mail au concepteur de QuadRico");
       contactInfo.textContent =
@@ -1727,16 +1784,17 @@
       contactInfo.textContent = "";
     });
     contactBtn.addEventListener('click', () => {
+      const to = "eric.marchetti@gendarmerie.interieur.gouv.fr";
       const subject = encodeURIComponent("QuadRico - remarques / améliorations");
       const body = encodeURIComponent(
         "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
       );
       const url =
-        "mailto:" +
-        encodeURIComponent("eric.marchetti@gendarmerie.interieur.gouv.fr") +
-        "?subject=" + subject +
+        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+        "&to=" + encodeURIComponent(to) +
+        "&su=" + subject +
         "&body=" + body;
-      window.location.href = url;
+      window.open(url, "_blank");
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -1830,13 +1888,11 @@
     });
 
     function getGridType() {
-      const r = document.querySelector('input[name="gridType"]:checked');
-      return r ? r.value : "fsi";
+      return gridTypeSelect.value || "fsi";
     }
 
     function getLabelMode() {
-      const r = document.querySelector('input[name="labelMode"]:checked');
-      return r ? r.value : "none";
+      return labelModeSelect.value || "none";
     }
 
     function getCrossMode() {
@@ -1915,6 +1971,7 @@
       baseCanvasWidth = canvas.width;
       baseCanvasHeight = canvas.height;
       applyZoomScale();
+      updateOrientationButton();
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2025,6 +2082,7 @@
 
       drawBase();
       drawZoneFills();
+      updateOrientationButton();
 
       if (!lastGridGeom) return;
 
@@ -2749,7 +2807,9 @@
         return;
       }
 
+      // Fonctionnement revenu comme avant : orientation cohérente avec la forme du canvas
       const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
+
       const dataUrl = canvas.toDataURL("image/png");
       const printWindow = window.open("", "_blank");
       if (!printWindow) {
@@ -2801,9 +2861,9 @@
       document.getElementById('cols').value = 10;
       document.getElementById('rows').value = 14;
 
-      document.querySelector('input[name="gridType"][value="fsi"]').checked = true;
-      document.querySelector('input[name="legendMode"][value="full"]').checked = true;
-      document.querySelector('input[name="labelMode"][value="none"]').checked = true;
+      gridTypeSelect.value   = "fsi";
+      legendModeSelect.value = "full";
+      labelModeSelect.value  = "none";
 
       dashedLines.checked = false;
       crossBlack.checked  = false;
@@ -2944,17 +3004,9 @@
     document.getElementById('cols').addEventListener('change', autoRedrawIfEnabled);
     document.getElementById('rows').addEventListener('change', autoRedrawIfEnabled);
 
-    document.querySelectorAll('input[name="legendMode"]').forEach(r => {
-      r.addEventListener('change', autoRedrawIfEnabled);
-    });
-
-    document.querySelectorAll('input[name="gridType"]').forEach(r => {
-      r.addEventListener('change', autoRedrawIfEnabled);
-    });
-
-    document.querySelectorAll('input[name="labelMode"]').forEach(r => {
-      r.addEventListener('change', autoRedrawIfEnabled);
-    });
+    legendModeSelect.addEventListener('change', autoRedrawIfEnabled);
+    gridTypeSelect.addEventListener('change', autoRedrawIfEnabled);
+    labelModeSelect.addEventListener('change', autoRedrawIfEnabled);
 
     imageOpacity.addEventListener('input', autoRedrawIfEnabled);
     gridOpacity.addEventListener('input', autoRedrawIfEnabled);
@@ -2962,7 +3014,7 @@
     dashedLines.addEventListener('change', autoRedrawIfEnabled);
     fillColorEl.addEventListener('change', autoRedrawIfEnabled);
 
-    // NOUVEAU : l’opacité de zone agit en direct sur la dernière case cliquée (si elle a une couleur de zone)
+    // Opacité zone : agit en direct sur la dernière case colorée
     fillOpacityEl.addEventListener('input', () => {
       if (!lastClickedCell) return;
       const key = `${lastClickedCell.c},${lastClickedCell.r}`;
@@ -2974,53 +3026,46 @@
       }
     });
 
-    /* ==== AIDE / MODAL ==== */
+    /* Infobulle pour Couleur de zone / Sélection de case – icône "?" */
+    let fillTooltipVisible = false;
 
-    function openHelp() {
-      helpOverlay.classList.remove('hidden');
-    }
-    function closeHelp() {
-      helpOverlay.classList.add('hidden');
-    }
-    function openWelcome() {
-      welcomeOverlay.classList.remove('hidden');
-    }
-    function closeWelcome() {
-      welcomeOverlay.classList.add('hidden');
+    function showFillTooltip() {
+      fillHelpTooltip.classList.remove('hidden');
+      fillTooltipVisible = true;
     }
 
-    helpBtn.addEventListener('click', () => {
-      closeWelcome();
-      openHelp();
-    });
+    function hideFillTooltip() {
+      fillHelpTooltip.classList.add('hidden');
+      fillTooltipVisible = false;
+    }
 
-    closeHelpBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeHelp();
-    });
+    if (fillHelpIcon && fillHelpTooltip && zoneHelpWrapper) {
+      // Desktop : affichage au survol de l'icône
+      fillHelpIcon.addEventListener('mouseenter', () => {
+        if (window.innerWidth > 900) showFillTooltip();
+      });
+      fillHelpIcon.addEventListener('mouseleave', () => {
+        if (window.innerWidth > 900) hideFillTooltip();
+      });
 
-    helpOverlay.addEventListener('click', (e) => {
-      if (e.target === helpOverlay) {
-        closeHelp();
-      }
-    });
+      // Mobile : clic pour ouvrir / fermer
+      fillHelpIcon.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900) {
+          e.stopPropagation();
+          if (fillTooltipVisible) {
+            hideFillTooltip();
+          } else {
+            showFillTooltip();
+          }
+        }
+      });
 
-    closeWelcomeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeWelcome();
-    });
-
-    welcomeOverlay.addEventListener('click', (e) => {
-      if (e.target === welcomeOverlay) {
-        closeWelcome();
-      }
-    });
-
-    window.addEventListener('load', () => {
-      openWelcome();
-      updateAutoRefreshButton();
-      updateMobileOrientationClasses();
-    });
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900 && !zoneHelpWrapper.contains(e.target)) {
+          hideFillTooltip();
+        }
+      });
+    }
 
     /* ==== SAUVEGARDE / CHARGEMENT SCÉNARIO ==== */
 
@@ -3064,14 +3109,9 @@
       document.getElementById('cols').value = s.cols || 10;
       document.getElementById('rows').value = s.rows || 14;
 
-      const gtInput = document.querySelector(`input[name="gridType"][value="${s.gridType || 'fsi'}"]`);
-      if (gtInput) gtInput.checked = true;
-
-      const lgInput = document.querySelector(`input[name="legendMode"][value="${s.legendMode || 'full'}"]`);
-      if (lgInput) lgInput.checked = true;
-
-      const lbInput = document.querySelector(`input[name="labelMode"][value="${s.labelMode || 'none'}"]`);
-      if (lbInput) lbInput.checked = true;
+      gridTypeSelect.value   = s.gridType || "fsi";
+      legendModeSelect.value = s.legendMode || "full";
+      labelModeSelect.value  = s.labelMode || "none";
 
       dashedLines.checked = !!s.dashedLines;
       crossBlack.checked  = !!s.crossBlack;
@@ -3085,8 +3125,8 @@
       codeOpacity.value   = s.codeOpacity ?? 100;
 
       const bwVal = s.borderWidth || "normal";
-      const bwInput = document.querySelector(`input[name="borderWidth"][value="${bwVal}"]`);
-      if (bwInput) bwInput.checked = true;
+      const bwInputRadio = document.querySelector(`input[name="borderWidth"][value="${bwVal}"]`);
+      if (bwInputRadio) bwInputRadio.checked = true;
 
       borderColorEl.value = s.borderColor || "none";
       textColorEl.value   = s.textColor || "";
@@ -3095,11 +3135,11 @@
       updateAutoRefreshButton();
 
       orientationMode = s.orientationMode || "portrait";
-      updateOrientationButton();
 
       zoomRange.value   = s.zoom || 100;
       zoomNumber.value  = zoomRange.value;
       applyZoomScale();
+      updateOrientationButton();
 
       fillColorEl.value   = s.fillColorDefault || "none";
       fillOpacityEl.value = s.fillOpacity || 35;
@@ -3534,7 +3574,7 @@
     exportPrintBtn.addEventListener('click', () => {
       closeExportMenu();
       printWithSize("A4");
-      setMsg("Fenêtre d’impression ouverte. La carto est centrée, proportionnelle, et l’orientation suit automatiquement la forme de la carte.");
+      setMsg("Fenêtre d’impression ouverte. La carto est centrée et l’orientation de la page est adaptée automatiquement à la forme de la carte.");
     });
 
     function sendExportByEmail() {
@@ -3554,12 +3594,16 @@
       const body = encodeURIComponent(
         "Carte générée avec QuadRico.\n\n" +
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
-        "Merci de l'ajouter en pièce jointe à ce mail avant envoi."
+        "Merci de l'ajouter en pièce jointe au mail avant envoi."
       );
-      const url = "mailto:?subject=" + subject + "&body=" + body;
-      window.location.href = url;
+      const url =
+        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+        "&su=" + subject +
+        "&body=" + body;
 
-      setMsg("PNG téléchargé. Ton application mail s'ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
+      window.open(url, "_blank");
+
+      setMsg("PNG téléchargé. Gmail Web s’ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
@@ -3588,6 +3632,55 @@
     }
 
     exportWhatsappBtn.addEventListener('click', sendExportByWhatsApp);
+
+    /* ==== AIDE / MODAL ==== */
+
+    function openHelp() {
+      helpOverlay.classList.remove('hidden');
+    }
+    function closeHelp() {
+      helpOverlay.classList.add('hidden');
+    }
+    function openWelcome() {
+      welcomeOverlay.classList.remove('hidden');
+    }
+    function closeWelcome() {
+      welcomeOverlay.classList.add('hidden');
+    }
+
+    helpBtn.addEventListener('click', () => {
+      closeWelcome();
+      openHelp();
+    });
+
+    closeHelpBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeHelp();
+    });
+
+    helpOverlay.addEventListener('click', (e) => {
+      if (e.target === helpOverlay) {
+        closeHelp();
+      }
+    });
+
+    closeWelcomeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeWelcome();
+    });
+
+    welcomeOverlay.addEventListener('click', (e) => {
+      if (e.target === welcomeOverlay) {
+        closeWelcome();
+      }
+    });
+
+    window.addEventListener('load', () => {
+      openWelcome();
+      updateAutoRefreshButton();
+      updateMobileOrientationClasses();
+      updateOrientationButton();
+    });
 
     /* ==== INIT ==== */
 
