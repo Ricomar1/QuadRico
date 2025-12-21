@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#mapContainer {
+    position: relative;
+    width: 80%;
+    height: 600px;
+    margin: auto;
+    border: 1px solid #ccc;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background-color: lightgrey;
+    position: relative;
+}
+
+.controls {
+    margin: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+#textControls button {
+    margin-top: 10px;
+}
+
+.layer {
+    position: absolute;
+    cursor: pointer;
+}
+
+.layer img {
+    max-width: 100px;
+    max-height: 100px;
+}

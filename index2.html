@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mon Site - Version 2</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Bienvenue sur le site - Version 2</h1>
+        <nav>
+            <ul>
+                <li><a href="#layer1">Couche 1</a></li>
+                <li><a href="#layer2">Couche 2</a></li>
+                <li><a href="#layer3">Couche 3</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="map">
+            <div class="map-container">
+                <!-- Carte dynamique ici -->
+                <div class="layer" id="layer1">
+                    <h2>Couche Cartographique</h2>
+                    <div class="map-overlay">
+                        <!-- Carte + Image + Logo -->
+                        <img src="assets/ops_graphik_logo.png" alt="Logo OPS Graphik" class="layer-logo" id="logo-layer">
+                    </div>
+                </div>
+                <div class="layer" id="layer2">
+                    <h2>Couche Texte</h2>
+                    <p>Ajoutez des éléments de texte personnalisés sur la carte.</p>
+                    <textarea id="text-layer" placeholder="Entrez votre texte ici"></textarea>
+                </div>
+                <div class="layer" id="layer3">
+                    <h2>Couche Quadrillage</h2>
+                    <p>Un quadrillage pour mieux structurer la carte.</p>
+                    <button id="show-grid">Afficher le quadrillage</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="email-section">
+            <h2>Envoi d'Email</h2>
+            <button id="send-email">Envoyer un email</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Mon Site. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Modal Layer Controls (options de personnalisation des couches) -->
+    <div id="layer-controls">
+        <h3>Personnalisation des couches</h3>
+        <label for="rotate-text">Rotation du texte :</label>
+        <input type="range" id="rotate-text" min="0" max="360" step="1">
+        <label for="resize-text">Redimensionner le texte :</label>
+        <input type="range" id="resize-text" min="10" max="100" step="5">
+    </div>
+</body>
+</html>
