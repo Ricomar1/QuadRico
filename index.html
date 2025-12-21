@@ -1517,13 +1517,13 @@
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
               <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée et une orientation de page adaptée à la forme de la carte.</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail Web avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG, puis ouvre soit Gmail Web sur ordinateur, soit ton application mail par défaut sur téléphone (ajoute le fichier en pièce jointe).</li>
               <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre un mail de contact vers le concepteur dans Gmail Web.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre un mail de contact vers le concepteur (Gmail Web sur ordinateur ou appli mail par défaut sur téléphone).</li>
         </ul>
       </details>
 
@@ -1669,6 +1669,12 @@
     let lastClickedCell = null;
     let copiedCellStyle = null;
 
+    // ====== DÉTECTION MOBILE / DESKTOP ======
+    function isMobileDevice() {
+      const ua = (navigator.userAgent || navigator.vendor || window.opera || "").toLowerCase();
+      return /android|iphone|ipad|ipod|windows phone|blackberry|opera mini|mobile/.test(ua);
+    }
+
     function setMsg(text) {
       msg.textContent = text || "";
     }
@@ -1773,7 +1779,7 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact (passe sur Gmail Web)
+    // Bouton de contact (client mail adapté desktop / mobile)
     contactBtn.addEventListener('mouseenter', () => {
       setIconHint("Envoyer un mail au concepteur de QuadRico");
       contactInfo.textContent =
@@ -1785,16 +1791,27 @@
     });
     contactBtn.addEventListener('click', () => {
       const to = "eric.marchetti@gendarmerie.interieur.gouv.fr";
-      const subject = encodeURIComponent("QuadRico - remarques / améliorations");
-      const body = encodeURIComponent(
+      const subjectEnc = encodeURIComponent("QuadRico - remarques / améliorations");
+      const bodyEnc = encodeURIComponent(
         "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
       );
-      const url =
-        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
-        "&to=" + encodeURIComponent(to) +
-        "&su=" + subject +
-        "&body=" + body;
-      window.open(url, "_blank");
+
+      if (isMobileDevice()) {
+        // Sur téléphone / tablette : application mail par défaut
+        const mailtoUrl =
+          "mailto:" + encodeURIComponent(to) +
+          "?subject=" + subjectEnc +
+          "&body=" + bodyEnc;
+        window.location.href = mailtoUrl;
+      } else {
+        // Sur ordinateur : Gmail Web (ou handler configuré pour ce type de lien)
+        const url =
+          "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+          "&to=" + encodeURIComponent(to) +
+          "&su=" + subjectEnc +
+          "&body=" + bodyEnc;
+        window.open(url, "_blank");
+      }
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -2573,7 +2590,7 @@
       if (historyIndex < history.length - 1) {
         historyIndex++;
         restoreFromHistory();
-        setMsg("Action rétablie.");
+        setMsg("Aucune action à rétablir.");
       } else {
         setMsg("Aucune action à rétablir.");
       }
@@ -3577,6 +3594,7 @@
       setMsg("Fenêtre d’impression ouverte. La carto est centrée et l’orientation de la page est adaptée automatiquement à la forme de la carte.");
     });
 
+    // ====== ENVOI PAR MAIL (desktop vs mobile) ======
     function sendExportByEmail() {
       closeExportMenu();
       if (!canvas.width || !canvas.height) {
@@ -3590,20 +3608,32 @@
       link.download = fileName;
       link.click();
 
-      const subject = encodeURIComponent("QuadRico - Carte quadrillée");
-      const body = encodeURIComponent(
+      const subjectRaw = "QuadRico - Carte quadrillée";
+      const bodyRaw =
         "Carte générée avec QuadRico.\n\n" +
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
-        "Merci de l'ajouter en pièce jointe au mail avant envoi."
-      );
-      const url =
-        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
-        "&su=" + subject +
-        "&body=" + body;
+        "Merci de l'ajouter en pièce jointe au mail avant envoi.";
 
-      window.open(url, "_blank");
+      const subjectEnc = encodeURIComponent(subjectRaw);
+      const bodyEnc = encodeURIComponent(bodyRaw);
 
-      setMsg("PNG téléchargé. Gmail Web s’ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
+      if (isMobileDevice()) {
+        // Téléphone / tablette : appli mail par défaut
+        const mailtoUrl =
+          "mailto:?subject=" + subjectEnc +
+          "&body=" + bodyEnc;
+        window.location.href = mailtoUrl;
+        setMsg("PNG téléchargé. Ouverture de ton application mail par défaut (ajoute le fichier en pièce jointe).");
+      } else {
+        // Ordinateur : Gmail Web (ou handler configuré pour ce type de lien)
+        const url =
+          "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+          "&su=" + subjectEnc +
+          "&body=" + bodyEnc;
+
+        window.open(url, "_blank");
+        setMsg("PNG téléchargé. Gmail Web ou ton webmail par défaut s’ouvre (ajoute le fichier en pièce jointe).");
+      }
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
