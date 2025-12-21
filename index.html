@@ -222,7 +222,6 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-start;
-      margin: 0 auto;
     }
 
     .source-box,
@@ -306,7 +305,7 @@
       text-align: center;
     }
 
-    /* Toolbar APPLIQUER / SUPPRIMER – STICKY (PC uniquement, mobile géré plus bas) */
+    /* Toolbar APPLIQUER / SUPPRIMER – STICKY */
 
     .toolbar-main {
       display: flex;
@@ -870,6 +869,11 @@
       z-index: 1100;
     }
 
+    .shortcut-key {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
     .zone-color-group-line label {
       width: 100%;
       display: flex;
@@ -907,10 +911,8 @@
         margin: 0 auto;
       }
 
-      /* le bandeau n'est plus figé sur mobile */
       .toolbar-main {
-        position: static;
-        top: auto;
+        top: 0;
         border-radius: 10px;
         justify-content: center;
         flex-wrap: wrap;
@@ -970,20 +972,16 @@
 
       .mobile-portrait .toolbar-main #optionsToggle { order: 5; }
 
-      /* CENTRAGE + LARGEUR DES BLOCS SOURCE / FEUILLES / GRILLE / LÉGENDE */
+      /* CENTRAGE DES BLOCS SOURCE / FEUILLES / PARAMÈTRES / LÉGENDE */
       .source-zoom-row {
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        width: 100%;
-        margin: 0 auto;
       }
       .source-zoom-row > .source-box,
       .source-zoom-row > .mid-box,
       .source-zoom-row > .zoom-box {
         width: 100%;
-        max-width: 100%;
-        min-width: 0;
+        max-width: 420px;
         margin: 0 auto;
       }
 
@@ -1004,27 +1002,6 @@
         transform: translateX(-50%);
         right: auto;
         width: min(260px, 90vw);
-      }
-
-      /* Disposition spéciale des boutons Sélection de case sur téléphone */
-      .selection-modes,
-      .selection-modes-second {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        justify-content: center;
-      }
-      #modeApply {
-        flex: 0 1 100%;
-      }
-      #modeEraseBorder,
-      #modeEraseCode {
-        flex: 0 1 calc(50% - 4px);
-      }
-      #modeMerge,
-      #modeSplit,
-      #modeReset {
-        flex: 0 1 calc(33.33% - 4px);
       }
     }
 
@@ -1297,7 +1274,7 @@
         <div class="group group-full">
           <strong>Sélection de case</strong>
 
-          <!-- ICÔNE "?" -->
+          <!-- ICÔNE "?" + TEXTE RÉSUMÉ (version raccourcie) -->
           <div id="zoneHelpWrapper" class="zone-help-wrapper">
             <button id="fillHelpIcon" type="button" class="case-help-btn">?</button>
             <div id="fillHelpTooltip" class="help-tooltip-inline hidden">
@@ -1316,7 +1293,6 @@
             </div>
           </div>
 
-          <!-- BOUTONS SÉLECTION DE CASE : 2 LIGNES (PC), 3 LIGNES (TEL via CSS) -->
           <div class="selection-modes">
             <button id="modeApply" class="selection-mode-btn active" type="button" title="Appliquer sur la case">
               <span class="icon">✎</span> Appliquer
@@ -1328,6 +1304,7 @@
               <span class="icon">✕</span> Effacer texte/croix
             </button>
           </div>
+
           <div class="selection-modes-second">
             <button id="modeMerge" class="selection-mode-btn" type="button" title="Fusionner les cases">
               <span class="icon">▩</span> Fusionner
@@ -1540,13 +1517,13 @@
               <li><strong>Enregistrer en PDF</strong> : génère automatiquement un PDF en portrait ou paysage selon la forme de la carte.</li>
               <li><strong>Enregistrer le quadrillage (sans la carto)</strong> : sauvegarde le quadrillage au format JSON, <strong>sans l’image de fond</strong>.</li>
               <li><strong>Imprimer</strong> : ouvre la fenêtre d’impression avec la carte centrée et une orientation de page adaptée à la forme de la carte.</li>
-              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre ton application de messagerie / client mail par défaut avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
+              <li><strong>Envoyer par mail</strong> : télécharge le PNG puis ouvre Gmail Web avec un mail pré-rempli (ajoute le fichier en pièce jointe).</li>
               <li><strong>Envoyer par WhatsApp</strong> : télécharge le PNG puis ouvre WhatsApp (web ou appli) avec un message pré-rempli.</li>
               <li><strong>Charger scénario QuadRico (.json)</strong> : charge un scénario précédemment sauvegardé.</li>
             </ul>
           </li>
           <li><strong>🗑</strong> : reset complet après confirmation.</li>
-          <li><strong>✉</strong> (icone concepteur) : ouvre ton application de messagerie / client mail par défaut vers le concepteur.</li>
+          <li><strong>✉</strong> (icone concepteur) : ouvre un mail de contact vers le concepteur dans Gmail Web.</li>
         </ul>
       </details>
 
@@ -1737,37 +1714,6 @@
 
     updateThemeButton();
 
-    // Détection mobile (utile si besoin plus tard)
-    function isMobileDevice() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
-    }
-
-    function openEmailClient(to, subjectText, bodyText) {
-  // Valeurs par défaut
-  to = to || "";
-  subjectText = subjectText || "";
-  bodyText = bodyText || "";
-
-  // Construction des paramètres (sujet / corps)
-  const params = [];
-  if (subjectText) params.push("subject=" + encodeURIComponent(subjectText));
-  if (bodyText)    params.push("body=" + encodeURIComponent(bodyText));
-
-  const query = params.length ? ("?" + params.join("&")) : "";
-
-  // Lien mailto classique -> laisse le système choisir Gmail, Outlook, etc.
-  const mailtoUrl = "mailto:" + to + query;
-
-  // Création d’un vrai lien cliqué par script
-  const a = document.createElement("a");
-  a.href = mailtoUrl;
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-
     // Icône portrait/paysage basée sur la forme réelle du canvas
     function updateOrientationButton() {
       const iconSpan = orientationToggle.querySelector('.orient-icon');
@@ -1827,9 +1773,9 @@
     addIconHint(autoRefreshBtn,   "Rafraîchissement auto : la carte se met à jour dès que tu modifies un paramètre général.");
     addIconHint(exportMenuBtn,    "Exporter / imprimer (PNG, PDF, quadrillage, mail, WhatsApp, scénario)");
 
-    // Bouton de contact (mailto pour PC + tél)
+    // Bouton de contact (passe sur Gmail Web)
     contactBtn.addEventListener('mouseenter', () => {
-      setIconHint("Envoyer un mail au concepteur de QuadRico (appli mail / client par défaut).");
+      setIconHint("Envoyer un mail au concepteur de QuadRico");
       contactInfo.textContent =
         "Pour toutes questions, remarques ou demandes d'amélioration, contacter par mail : eric.marchetti@gendarmerie.interieur.gouv.fr";
     });
@@ -1839,10 +1785,16 @@
     });
     contactBtn.addEventListener('click', () => {
       const to = "eric.marchetti@gendarmerie.interieur.gouv.fr";
-      const subjectText = "QuadRico - remarques / améliorations";
-      const bodyText =
-        "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n";
-      openEmailClient(to, subjectText, bodyText);
+      const subject = encodeURIComponent("QuadRico - remarques / améliorations");
+      const body = encodeURIComponent(
+        "Bonjour,\n\nJe vous contacte au sujet de l'outil QuadRico pour vous faire part de questions, remarques ou demandes d'amélioration.\n\nCordialement,\n"
+      );
+      const url =
+        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+        "&to=" + encodeURIComponent(to) +
+        "&su=" + subject +
+        "&body=" + body;
+      window.open(url, "_blank");
     });
 
     briefingBtn.addEventListener('click', () => {
@@ -2691,11 +2643,11 @@
 
       pushHistory();
 
-      const fillValue = fillColorEl.value;
+      const fillValue = fillColorEl.value; // "none" ou couleur rgba(...)
       const fillAlpha = parseInt(fillOpacityEl.value || "35", 10) / 100;
 
       if (selectionAction === "apply") {
-        const borderChoice = borderColorEl.value;
+        const borderChoice = borderColorEl.value; // "none" ou couleur
         const borderWidth = getBorderWidthPx();
         const text = cellTextEl.value.trim();
         const txtColor = textColorEl.value || "";
@@ -2708,6 +2660,7 @@
           effectiveBorderColor = borderChoice;
         }
 
+        // Mise à jour du bloc fusionné (bordure / texte uniquement)
         if (regionHere) {
           regionHere.borderColor = effectiveBorderColor;
           regionHere.borderWidth = borderWidth;
@@ -2716,6 +2669,7 @@
           regionHere.alpha       = alpha;
         }
 
+        // Couleur / opacité de zone et style appliqués à la case cliquée
         const existing = selectedCells[key] || {};
 
         let newFillColor = (typeof existing.fillColor !== "undefined") ? existing.fillColor : null;
@@ -2853,7 +2807,7 @@
         return;
       }
 
-      // orientation cohérente avec la forme du canvas
+      // Fonctionnement revenu comme avant : orientation cohérente avec la forme du canvas
       const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
 
       const dataUrl = canvas.toDataURL("image/png");
@@ -3342,6 +3296,7 @@
       }
     });
 
+    // ⧉ : dupliquer la feuille actuellement affichée
     duplicateSheet1Btn.addEventListener('click', () => {
       if (!sheets.length || !sheets[currentSheetIndex].scenario) {
         setMsg("La feuille actuelle n'a pas encore de scénario à copier (applique un quadrillage d'abord).");
@@ -3635,15 +3590,20 @@
       link.download = fileName;
       link.click();
 
-      const subjectText = "QuadRico - Carte quadrillée";
-      const bodyText =
+      const subject = encodeURIComponent("QuadRico - Carte quadrillée");
+      const body = encodeURIComponent(
         "Carte générée avec QuadRico.\n\n" +
         "Le fichier \"" + fileName + "\" vient d'être téléchargé sur ton appareil.\n" +
-        "Merci de l'ajouter en pièce jointe au mail avant envoi.\n";
+        "Merci de l'ajouter en pièce jointe au mail avant envoi."
+      );
+      const url =
+        "https://mail.google.com/mail/u/0/?view=cm&fs=1" +
+        "&su=" + subject +
+        "&body=" + body;
 
-      openEmailClient("", subjectText, bodyText);
+      window.open(url, "_blank");
 
-      setMsg("PNG téléchargé. Ta messagerie / ton client mail par défaut s'ouvre : ajoute le fichier en pièce jointe.");
+      setMsg("PNG téléchargé. Gmail Web s’ouvre pour envoyer le message (ajoute le fichier en pièce jointe).");
     }
 
     exportMailBtn.addEventListener('click', sendExportByEmail);
